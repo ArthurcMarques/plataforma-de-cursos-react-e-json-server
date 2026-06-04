@@ -575,49 +575,449 @@ function nomePorId(lista, id, campo) {
     return item ? item[campo] : "-";
 }
 
-function PlaceholderPage({ titulo }) {
+function ModulosPage({ dados, adicionar, remover, avisar }) {
+    const rows = dados.modulos.map((modulo) => ({
+        ...modulo,
+        cursoNome: nomePorId(dados.cursos, modulo.idCurso, "titulo")
+    }));
+
+    return h(CrudPage, {
+        titulo: "Módulos",
+        descricao: "Organize módulos dentro dos cursos.",
+        initialValues: { idCurso: "", titulo: "", ordem: "" },
+        fields: [
+            { name: "idCurso", label: "Curso", type: "select", required: true, options: dados.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+            { name: "titulo", label: "Título", required: true },
+            { name: "ordem", label: "Ordem", type: "number", min: 1, required: true }
+        ],
+        columns: [
+            { key: "cursoNome", label: "Curso" },
+            { key: "titulo", label: "Módulo" },
+            { key: "ordem", label: "Ordem" }
+        ],
+        rows,
+        emptyText: "Nenhum módulo cadastrado.",
+        onSubmit: (form) => {
+            const idCurso = Number(form.idCurso);
+            const ordem = Number(form.ordem);
+            const repetido = dados.modulos.some((item) => Number(item.idCurso) === idCurso && Number(item.ordem) === ordem);
+            if (repetido) {
+                avisar("Já existe um módulo com essa ordem neste curso.", "danger");
+                return false;
+            }
+            adicionar("modulos", { idCurso, titulo: form.titulo.trim(), ordem });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("modulos", item.id) }, "Excluir")
+    });
+}
+
+function AulasPage({ dados, adicionar, remover, avisar }) {
+    const rows = dados.aulas.map((aula) => {
+        const modulo = dados.modulos.find((item) => Number(item.id) === Number(aula.idModulo));
+        return {
+            ...aula,
+            moduloNome: modulo ? modulo.titulo : "-",
+            cursoNome: modulo ? nomePorId(dados.cursos, modulo.idCurso, "titulo") : "-"
+        };
+    });
+
+    return h(CrudPage, {
+        titulo: "Aulas",
+        descricao: "Cadastre aulas dentro dos módulos.",
+        initialValues: { idModulo: "", titulo: "", tipoConteudo: "", urlConteudo: "", duracaoMinutos: "", ordem: "" },
+        fields: [
+            { name: "idModulo", label: "Módulo", type: "select", required: true, options: dados.modulos.map((item) => ({ value: item.id, label: `${nomePorId(dados.cursos, item.idCurso, "titulo")} - ${item.titulo}` })) },
+            { name: "titulo", label: "Título", required: true },
+            { name: "tipoConteudo", label: "Tipo", type: "select", required: true, options: [
+                { value: "Vídeo", label: "Vídeo" },
+                { value: "Texto", label: "Texto" },
+                { value: "Quiz", label: "Quiz" }
+            ] },
+            { name: "duracaoMinutos", label: "Duração em minutos", type: "number", min: 1, required: true },
+            { name: "ordem", label: "Ordem", type: "number", min: 1, required: true },
+            { name: "urlConteudo", label: "URL do conteúdo", type: "url", col: "col-12" }
+        ],
+        columns: [
+            { key: "cursoNome", label: "Curso" },
+            { key: "moduloNome", label: "Módulo" },
+            { key: "titulo", label: "Aula" },
+            { key: "tipoConteudo", label: "Tipo" },
+            { key: "duracaoMinutos", label: "Duração", render: (item) => `${item.duracaoMinutos} min` },
+            { key: "ordem", label: "Ordem" }
+        ],
+        rows,
+        emptyText: "Nenhuma aula cadastrada.",
+        onSubmit: (form) => {
+            const idModulo = Number(form.idModulo);
+            const ordem = Number(form.ordem);
+            const repetida = dados.aulas.some((item) => Number(item.idModulo) === idModulo && Number(item.ordem) === ordem);
+            if (repetida) {
+                avisar("Já existe uma aula com essa ordem neste módulo.", "danger");
+                return false;
+            }
+            adicionar("aulas", {
+                idModulo,
+                titulo: form.titulo.trim(),
+                tipoConteudo: form.tipoConteudo,
+                urlConteudo: form.urlConteudo.trim(),
+                duracaoMinutos: Number(form.duracaoMinutos),
+                ordem
+            });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("aulas", item.id) }, "Excluir")
+    });
+}
+
+function TrilhasPage({ dados, adicionar, remover, atualizarColecao, avisar }) {
+    const [vinculo, setVinculo] = useState({ idTrilha: "", idCurso: "", ordem: "" });
+    const vinculos = dados.trilhasCursos.map((item) => ({
+        ...item,
+        key: `${item.idTrilha}-${item.idCurso}`,
+        trilhaNome: nomePorId(dados.trilhas, item.idTrilha, "titulo"),
+        cursoNome: nomePorId(dados.cursos, item.idCurso, "titulo")
+    }));
+
+    function salvarVinculo(event) {
+        event.preventDefault();
+        const idTrilha = Number(vinculo.idTrilha);
+        const idCurso = Number(vinculo.idCurso);
+        const ordem = Number(vinculo.ordem);
+        const repetido = dados.trilhasCursos.some((item) => Number(item.idTrilha) === idTrilha && Number(item.idCurso) === idCurso);
+        if (repetido) {
+            avisar("Esse curso já está vinculado a essa trilha.", "danger");
+            return;
+        }
+        atualizarColecao("trilhasCursos", (lista) => [...lista, { idTrilha, idCurso, ordem }]);
+        setVinculo({ idTrilha: "", idCurso: "", ordem: "" });
+        avisar("Curso vinculado à trilha.");
+    }
+
     return h(
-        "section",
-        { className: "bg-white border rounded-3 p-4 p-md-5" },
-        h("h1", { className: "h3 mb-2" }, titulo),
-        h("p", { className: "text-muted mb-0" }, "Esta tela entra na próxima etapa da migração React.")
+        React.Fragment,
+        null,
+        h(CrudPage, {
+            titulo: "Trilhas",
+            descricao: "Crie trilhas de conhecimento e relacione cursos.",
+            initialValues: { titulo: "", descricao: "", idCategoria: "" },
+            fields: [
+                { name: "titulo", label: "Título", required: true },
+                { name: "idCategoria", label: "Categoria", type: "select", required: true, options: dados.categorias.map((item) => ({ value: item.id, label: item.nome })) },
+                { name: "descricao", label: "Descrição", type: "textarea", col: "col-12" }
+            ],
+            columns: [
+                { key: "titulo", label: "Título" },
+                { key: "categoria", label: "Categoria", render: (item) => nomePorId(dados.categorias, item.idCategoria, "nome") },
+                { key: "descricao", label: "Descrição", render: (item) => item.descricao || "-" }
+            ],
+            rows: dados.trilhas,
+            emptyText: "Nenhuma trilha cadastrada.",
+            onSubmit: (form) => {
+                adicionar("trilhas", { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
+                return true;
+            },
+            renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("trilhas", item.id) }, "Excluir")
+        }),
+        h(
+            "section",
+            { className: "bg-white border rounded-3 p-4" },
+            h("h2", { className: "h5 mb-3" }, "Cursos da trilha"),
+            h("form", { className: "row g-3", onSubmit: salvarVinculo },
+                h(FormField, { field: { name: "idTrilha", label: "Trilha", type: "select", required: true, options: dados.trilhas.map((item) => ({ value: item.id, label: item.titulo })) }, value: vinculo.idTrilha, onChange: (campo, valor) => setVinculo((atual) => ({ ...atual, [campo]: valor })) }),
+                h(FormField, { field: { name: "idCurso", label: "Curso", type: "select", required: true, options: dados.cursos.map((item) => ({ value: item.id, label: item.titulo })) }, value: vinculo.idCurso, onChange: (campo, valor) => setVinculo((atual) => ({ ...atual, [campo]: valor })) }),
+                h(FormField, { field: { name: "ordem", label: "Ordem", type: "number", min: 1, required: true }, value: vinculo.ordem, onChange: (campo, valor) => setVinculo((atual) => ({ ...atual, [campo]: valor })) }),
+                h("div", { className: "col-12" }, h("button", { type: "submit", className: "btn btn-primary" }, "Vincular"))
+            )
+        ),
+        h(DataTable, {
+            columns: [
+                { key: "trilhaNome", label: "Trilha" },
+                { key: "cursoNome", label: "Curso" },
+                { key: "ordem", label: "Ordem" }
+            ],
+            rows: vinculos,
+            emptyText: "Nenhum curso vinculado a trilhas.",
+            renderActions: (item) => h(ActionButton, {
+                variant: "outline-danger",
+                onClick: () => atualizarColecao("trilhasCursos", (lista) => lista.filter((registro) => !(Number(registro.idTrilha) === Number(item.idTrilha) && Number(registro.idCurso) === Number(item.idCurso))))
+            }, "Excluir")
+        })
     );
 }
 
-function ModulosPage() {
-    return h(PlaceholderPage, { titulo: "Módulos" });
+function MatriculasPage({ dados, adicionar, remover, avisar }) {
+    const rows = dados.matriculas.map((item) => ({
+        ...item,
+        usuarioNome: nomePorId(dados.usuarios, item.idUsuario, "nomeCompleto"),
+        cursoNome: nomePorId(dados.cursos, item.idCurso, "titulo")
+    }));
+
+    return h(CrudPage, {
+        titulo: "Matrículas",
+        descricao: "Simule a matrícula de usuários em cursos.",
+        initialValues: { idUsuario: "", idCurso: "", dataMatricula: hojeISO() },
+        fields: [
+            { name: "idUsuario", label: "Usuário", type: "select", required: true, options: dados.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+            { name: "idCurso", label: "Curso", type: "select", required: true, options: dados.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+            { name: "dataMatricula", label: "Data", type: "date", required: true }
+        ],
+        columns: [
+            { key: "usuarioNome", label: "Usuário" },
+            { key: "cursoNome", label: "Curso" },
+            { key: "dataMatricula", label: "Data" }
+        ],
+        rows,
+        emptyText: "Nenhuma matrícula cadastrada.",
+        onSubmit: (form) => {
+            const idUsuario = Number(form.idUsuario);
+            const idCurso = Number(form.idCurso);
+            const repetida = dados.matriculas.some((item) => Number(item.idUsuario) === idUsuario && Number(item.idCurso) === idCurso);
+            if (repetida) {
+                avisar("Esse usuário já está matriculado nesse curso.", "danger");
+                return false;
+            }
+            adicionar("matriculas", { idUsuario, idCurso, dataMatricula: form.dataMatricula, dataConclusao: null });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("matriculas", item.id) }, "Excluir")
+    });
 }
 
-function AulasPage() {
-    return h(PlaceholderPage, { titulo: "Aulas" });
+function ProgressoPage({ dados, adicionar, atualizarColecao, avisar }) {
+    const rows = dados.progressoAulas.map((item) => ({
+        ...item,
+        key: `${item.idUsuario}-${item.idAula}`,
+        usuarioNome: nomePorId(dados.usuarios, item.idUsuario, "nomeCompleto"),
+        aulaNome: nomePorId(dados.aulas, item.idAula, "titulo")
+    }));
+
+    return h(CrudPage, {
+        titulo: "Progresso",
+        descricao: "Registre conclusão ou andamento das aulas.",
+        initialValues: { idUsuario: "", idAula: "", status: "Concluído", dataConclusao: hojeISO() },
+        fields: [
+            { name: "idUsuario", label: "Usuário", type: "select", required: true, options: dados.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+            { name: "idAula", label: "Aula", type: "select", required: true, options: dados.aulas.map((item) => ({ value: item.id, label: item.titulo })) },
+            { name: "status", label: "Status", type: "select", required: true, options: [
+                { value: "Concluído", label: "Concluído" },
+                { value: "Em andamento", label: "Em andamento" }
+            ] },
+            { name: "dataConclusao", label: "Data", type: "date", required: true }
+        ],
+        columns: [
+            { key: "usuarioNome", label: "Usuário" },
+            { key: "aulaNome", label: "Aula" },
+            { key: "status", label: "Status" },
+            { key: "dataConclusao", label: "Data" }
+        ],
+        rows,
+        emptyText: "Nenhum progresso registrado.",
+        onSubmit: (form) => {
+            const idUsuario = Number(form.idUsuario);
+            const idAula = Number(form.idAula);
+            const repetido = dados.progressoAulas.some((item) => Number(item.idUsuario) === idUsuario && Number(item.idAula) === idAula);
+            if (repetido) {
+                avisar("Esse usuário já possui progresso nessa aula.", "danger");
+                return false;
+            }
+            adicionar("progressoAulas", { idUsuario, idAula, status: form.status, dataConclusao: form.dataConclusao });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, {
+            variant: "outline-danger",
+            onClick: () => atualizarColecao("progressoAulas", (lista) => lista.filter((registro) => !(Number(registro.idUsuario) === Number(item.idUsuario) && Number(registro.idAula) === Number(item.idAula))))
+        }, "Excluir")
+    });
 }
 
-function TrilhasPage() {
-    return h(PlaceholderPage, { titulo: "Trilhas" });
+function AvaliacoesPage({ dados, adicionar, remover }) {
+    const rows = dados.avaliacoes.map((item) => ({
+        ...item,
+        usuarioNome: nomePorId(dados.usuarios, item.idUsuario, "nomeCompleto"),
+        cursoNome: nomePorId(dados.cursos, item.idCurso, "titulo")
+    }));
+
+    return h(CrudPage, {
+        titulo: "Avaliações",
+        descricao: "Registre avaliações de usuários para os cursos.",
+        initialValues: { idUsuario: "", idCurso: "", nota: "", comentario: "", dataAvaliacao: hojeISO() },
+        fields: [
+            { name: "idUsuario", label: "Usuário", type: "select", required: true, options: dados.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+            { name: "idCurso", label: "Curso", type: "select", required: true, options: dados.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+            { name: "nota", label: "Nota", type: "select", required: true, options: [1, 2, 3, 4, 5].map((nota) => ({ value: nota, label: String(nota) })) },
+            { name: "dataAvaliacao", label: "Data", type: "date", required: true },
+            { name: "comentario", label: "Comentário", type: "textarea", col: "col-12" }
+        ],
+        columns: [
+            { key: "usuarioNome", label: "Usuário" },
+            { key: "cursoNome", label: "Curso" },
+            { key: "nota", label: "Nota" },
+            { key: "comentario", label: "Comentário", render: (item) => item.comentario || "-" },
+            { key: "dataAvaliacao", label: "Data" }
+        ],
+        rows,
+        emptyText: "Nenhuma avaliação cadastrada.",
+        onSubmit: (form) => {
+            adicionar("avaliacoes", { ...form, idUsuario: Number(form.idUsuario), idCurso: Number(form.idCurso), nota: Number(form.nota) });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("avaliacoes", item.id) }, "Excluir")
+    });
 }
 
-function MatriculasPage() {
-    return h(PlaceholderPage, { titulo: "Matrículas" });
+function CertificadosPage({ dados, atualizarColecao, avisar }) {
+    const rows = dados.certificados.map((item) => ({
+        ...item,
+        usuarioNome: nomePorId(dados.usuarios, item.idUsuario, "nomeCompleto"),
+        cursoNome: nomePorId(dados.cursos, item.idCurso, "titulo")
+    }));
+
+    function usuarioTemProgressoConcluido(idUsuario, idCurso) {
+        const modulosCurso = dados.modulos.filter((modulo) => Number(modulo.idCurso) === Number(idCurso));
+        const idsAulasCurso = dados.aulas
+            .filter((aula) => modulosCurso.some((modulo) => Number(modulo.id) === Number(aula.idModulo)))
+            .map((aula) => Number(aula.id));
+        return dados.progressoAulas.some((progresso) => {
+            return Number(progresso.idUsuario) === Number(idUsuario) &&
+                idsAulasCurso.includes(Number(progresso.idAula)) &&
+                normalizarTexto(progresso.status).includes("concl");
+        });
+    }
+
+    return h(CrudPage, {
+        titulo: "Certificados",
+        descricao: "Gere certificados para usuários com progresso concluído no curso.",
+        initialValues: { idUsuario: "", idCurso: "", dataEmissao: hojeISO() },
+        fields: [
+            { name: "idUsuario", label: "Usuário", type: "select", required: true, options: dados.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+            { name: "idCurso", label: "Curso", type: "select", required: true, options: dados.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+            { name: "dataEmissao", label: "Data de emissão", type: "date", required: true }
+        ],
+        columns: [
+            { key: "usuarioNome", label: "Usuário" },
+            { key: "cursoNome", label: "Curso" },
+            { key: "codigoVerificacao", label: "Código" },
+            { key: "dataEmissao", label: "Emissão" }
+        ],
+        rows,
+        emptyText: "Nenhum certificado gerado.",
+        onSubmit: (form) => {
+            const idUsuario = Number(form.idUsuario);
+            const idCurso = Number(form.idCurso);
+            const duplicado = dados.certificados.some((item) => Number(item.idUsuario) === idUsuario && Number(item.idCurso) === idCurso);
+            if (duplicado) {
+                avisar("Já existe certificado para esse usuário nesse curso.", "danger");
+                return false;
+            }
+            if (!usuarioTemProgressoConcluido(idUsuario, idCurso)) {
+                avisar("Registre progresso concluído em uma aula desse curso antes de gerar certificado.", "danger");
+                return false;
+            }
+            atualizarColecao("certificados", (lista) => {
+                const id = proximoId(lista);
+                return [...lista, { id, idUsuario, idCurso, idTrilha: null, codigoVerificacao: `CERT-${String(id).padStart(3, "0")}`, dataEmissao: form.dataEmissao }];
+            });
+            avisar("Certificado gerado com sucesso.");
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, {
+            variant: "outline-danger",
+            onClick: () => atualizarColecao("certificados", (lista) => lista.filter((registro) => Number(registro.id) !== Number(item.id)))
+        }, "Excluir")
+    });
 }
 
-function ProgressoPage() {
-    return h(PlaceholderPage, { titulo: "Progresso" });
+function AssinaturasPage({ dados, adicionar, remover }) {
+    const rows = dados.assinaturas.map((item) => ({
+        ...item,
+        usuarioNome: nomePorId(dados.usuarios, item.idUsuario, "nomeCompleto"),
+        planoNome: nomePorId(dados.planos, item.idPlano, "nome")
+    }));
+
+    return h(CrudPage, {
+        titulo: "Assinaturas",
+        descricao: "Vincule usuários a planos por período.",
+        initialValues: { idUsuario: "", idPlano: "", dataInicio: hojeISO(), dataFim: hojeISO() },
+        fields: [
+            { name: "idUsuario", label: "Usuário", type: "select", required: true, options: dados.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+            { name: "idPlano", label: "Plano", type: "select", required: true, options: dados.planos.map((item) => ({ value: item.id, label: item.nome })) },
+            { name: "dataInicio", label: "Início", type: "date", required: true },
+            { name: "dataFim", label: "Fim", type: "date", required: true }
+        ],
+        columns: [
+            { key: "usuarioNome", label: "Usuário" },
+            { key: "planoNome", label: "Plano" },
+            { key: "dataInicio", label: "Início" },
+            { key: "dataFim", label: "Fim" }
+        ],
+        rows,
+        emptyText: "Nenhuma assinatura cadastrada.",
+        onSubmit: (form) => {
+            adicionar("assinaturas", { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("assinaturas", item.id) }, "Excluir")
+    });
 }
 
-function AvaliacoesPage() {
-    return h(PlaceholderPage, { titulo: "Avaliações" });
+function PagamentosPage({ dados, adicionar, remover, avisar }) {
+    const rows = dados.pagamentos.map((item) => ({
+        ...item,
+        assinaturaNome: descricaoAssinatura(dados, item.idAssinatura)
+    }));
+
+    return h(CrudPage, {
+        titulo: "Pagamentos",
+        descricao: "Registre pagamentos simulados para assinaturas.",
+        initialValues: { idAssinatura: "", valorPago: "", dataPagamento: hojeISO(), metodoPagamento: "", idTransacaoGateway: "" },
+        fields: [
+            { name: "idAssinatura", label: "Assinatura", type: "select", required: true, options: dados.assinaturas.map((item) => ({ value: item.id, label: descricaoAssinatura(dados, item.id) })) },
+            { name: "valorPago", label: "Valor pago", type: "number", min: 0, step: "0.01", required: true },
+            { name: "dataPagamento", label: "Data", type: "date", required: true },
+            { name: "metodoPagamento", label: "Método", type: "select", required: true, options: [
+                { value: "Cartão", label: "Cartão" },
+                { value: "Pix", label: "Pix" },
+                { value: "Boleto", label: "Boleto" }
+            ] },
+            { name: "idTransacaoGateway", label: "ID da transação", required: true }
+        ],
+        columns: [
+            { key: "assinaturaNome", label: "Assinatura" },
+            { key: "valorPago", label: "Valor", render: (item) => `R$ ${Number(item.valorPago).toFixed(2)}` },
+            { key: "dataPagamento", label: "Data" },
+            { key: "metodoPagamento", label: "Método" },
+            { key: "idTransacaoGateway", label: "Transação" }
+        ],
+        rows,
+        emptyText: "Nenhum pagamento cadastrado.",
+        onSubmit: (form) => {
+            const transacao = form.idTransacaoGateway.trim();
+            const repetida = dados.pagamentos.some((item) => normalizarTexto(item.idTransacaoGateway) === normalizarTexto(transacao));
+            if (repetida) {
+                avisar("Já existe pagamento com esse ID de transação.", "danger");
+                return false;
+            }
+            adicionar("pagamentos", {
+                idAssinatura: Number(form.idAssinatura),
+                valorPago: Number(form.valorPago),
+                dataPagamento: form.dataPagamento,
+                metodoPagamento: form.metodoPagamento,
+                idTransacaoGateway: transacao
+            });
+            return true;
+        },
+        renderActions: (item) => h(ActionButton, { variant: "outline-danger", onClick: () => remover("pagamentos", item.id) }, "Excluir")
+    });
 }
 
-function CertificadosPage() {
-    return h(PlaceholderPage, { titulo: "Certificados" });
-}
+function descricaoAssinatura(dados, idAssinatura) {
+    const assinatura = dados.assinaturas.find((item) => Number(item.id) === Number(idAssinatura));
+    if (!assinatura) {
+        return "-";
+    }
 
-function AssinaturasPage() {
-    return h(PlaceholderPage, { titulo: "Assinaturas" });
-}
-
-function PagamentosPage() {
-    return h(PlaceholderPage, { titulo: "Pagamentos" });
+    return `${nomePorId(dados.usuarios, assinatura.idUsuario, "nomeCompleto")} - ${nomePorId(dados.planos, assinatura.idPlano, "nome")}`;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(h(App));
