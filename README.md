@@ -10,7 +10,8 @@ Documentação base do professor:
 
 - HTML5
 - Bootstrap 5
-- JavaScript puro (ES Modules)
+- React 18 via CDN
+- JavaScript puro
 - `localStorage` para persistência simples no navegador
 
 ## Estrutura principal
@@ -34,6 +35,7 @@ plataforma-cursos/
     assinaturas.html
     pagamentos.html
   js/
+    reactApp.js
     main.js
     models/
     storage/localStorage.js
@@ -42,28 +44,24 @@ plataforma-cursos/
 ## Funcionalidades implementadas
 
 ### Módulo Acadêmico e de Conteúdo
-- Categorias: cadastro, listagem, edição e exclusão.
-- Cursos: cadastro, listagem, edição e exclusão.
-- Filtro de cursos por categoria.
-- Módulos por curso: cadastro e listagem por `idCurso`.
-- Aulas por módulo: cadastro e listagem por `idModulo`.
+- Categorias: cadastro, listagem e exclusão.
+- Cursos: cadastro, listagem e exclusão.
+- Módulos por curso: cadastro, listagem e exclusão.
+- Aulas por módulo: cadastro, listagem e exclusão.
 - Trilhas: cadastro e listagem.
 - Trilha x Cursos: vínculo e listagem.
 
 ### Módulo de Usuário e Progresso
-- Usuários: cadastro, listagem, edição e exclusão.
+- Usuários: cadastro, listagem e exclusão.
 - Matrículas: cadastro e listagem.
 - Progresso de aulas: registro e listagem.
 - Avaliações: registro e listagem.
-- Certificados: geração visual, validação simples por progresso e listagem.
+- Certificados: geração com código de verificação, validação simples por progresso e listagem.
 
 ### Módulo Financeiro
 - Planos: cadastro e listagem.
 - Assinaturas: cadastro e listagem.
 - Pagamentos: cadastro e listagem.
-- Checkout simples em pagamentos:
-  - seleção de usuário para filtrar assinaturas
-  - valor sugerido automaticamente pelo plano da assinatura.
 
 ## Regras e validações já aplicadas
 
@@ -72,20 +70,23 @@ plataforma-cursos/
 - Validação simples de e-mail.
 - Bloqueios simples de duplicidade em entidades chave.
 - Relacionamentos por ID entre entidades (usuário, curso, módulo, aula, plano, assinatura).
-- Atualização de `totalAulas` e `totalHoras` em cursos com base nas aulas cadastradas.
+- Cálculo de aulas e horas em cursos com base nas aulas cadastradas.
 
 ## Padrão de interface
 
-- Navbar padronizada nas páginas.
-- Listagens como área principal.
-- Formulários em modal com botão `Inserir`.
-- Coluna `Ações` com dropdown.
+- Navbar React com navegação por módulos.
+- Dashboard com contadores principais.
+- Formulários inline e listagens como área principal.
+- Coluna `Ações` com botões diretos.
 
 ## Como executar
 
 1. Abra o `index.html` no navegador.
-2. Navegue entre as telas pelo menu.
-3. Cadastre dados de exemplo.
+2. Aguarde o carregamento dos scripts CDN do React, ReactDOM e Bootstrap.
+3. Navegue entre as telas pelo menu.
+4. Cadastre dados de exemplo.
+
+> Observação: a versão React atual não exige `npm install` nem etapa de build.
 
 ## Persistência de dados
 
@@ -100,7 +101,7 @@ localStorage.clear()
 ## Observações
 
 - Não usa backend.
-- Não usa bibliotecas JavaScript externas além do Bootstrap.
+- Usa React por CDN para manter execução simples em ambiente acadêmico.
 - Projeto focado em implementação simples e didática.
 
 
