@@ -16,7 +16,6 @@ import type {
     Modulo,
     Pagamento,
     Plano,
-    ProgressoAula,
     Trilha,
     TrilhaCurso,
     Usuario
@@ -493,40 +492,113 @@ function EnrollmentsPage({ data, addWithId, removeById, notify }: PageProps) {
 }
 
 function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) {
-    const rows = data.progressoAulas.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), aulaNome: nameById(data.aulas, item.idAula, "titulo") }));
+    const [selectedUserId, setSelectedUserId] = useState("");
+    const idUsuario = Number(selectedUserId);
+    const selectedUser = data.usuarios.find((item) => item.id === idUsuario);
+
+    function isLessonDone(idAula: number) {
+        return data.progressoAulas.some((item) => {
+            return item.idUsuario === idUsuario && item.idAula === idAula && normalize(item.status).includes("concl");
+        });
+    }
+
+    function toggleLesson(idAula: number, checked: boolean) {
+        if (!idUsuario) {
+            notify("Selecione um aluno antes de marcar aulas.", "danger");
+            return;
+        }
+
+        updateCollection("progressoAulas", (list) => {
+            const withoutCurrent = list.filter((item) => !(item.idUsuario === idUsuario && item.idAula === idAula));
+            if (!checked) {
+                return withoutCurrent;
+            }
+
+            return [...withoutCurrent, { idUsuario, idAula, status: "Concluído", dataConclusao: todayISO() }];
+        });
+    }
+
+    function courseProgress(course: Curso) {
+        const modules = data.modulos.filter((module) => module.idCurso === course.id);
+        const lessons = data.aulas.filter((lesson) => modules.some((module) => module.id === lesson.idModulo));
+        const done = lessons.filter((lesson) => isLessonDone(lesson.id)).length;
+        return { done, total: lessons.length };
+    }
 
     return (
-        <CrudPage
-            title="Progresso"
-            description="Registre conclusão ou andamento das aulas."
-            initialValues={{ idUsuario: "", idAula: "", status: "Concluído", dataConclusao: todayISO() }}
-            fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
-                { name: "idAula", label: "Aula", type: "select", required: true, options: data.aulas.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Aula", onAction: () => quickCreateLesson({ data, addWithId, notify }) },
-                { name: "status", label: "Status", type: "select", required: true, options: [{ value: "Concluído", label: "Concluído" }, { value: "Em andamento", label: "Em andamento" }] },
-                { name: "dataConclusao", label: "Data", type: "date", required: true }
-            ]}
-            columns={[
-                { key: "usuarioNome", label: "Usuário" },
-                { key: "aulaNome", label: "Aula" },
-                { key: "status", label: "Status" },
-                { key: "dataConclusao", label: "Data" }
-            ]}
-            rows={rows}
-            emptyText="Nenhum progresso registrado."
-            getRowKey={(item) => `${item.idUsuario}-${item.idAula}`}
-            onSubmit={(form) => {
-                const idUsuario = Number(form.idUsuario);
-                const idAula = Number(form.idAula);
-                if (data.progressoAulas.some((item) => item.idUsuario === idUsuario && item.idAula === idAula)) {
-                    notify("Esse usuário já possui progresso nessa aula.", "danger");
-                    return false;
-                }
-                addWithId("progressoAulas", { idUsuario, idAula, status: form.status as ProgressoAula["status"], dataConclusao: form.dataConclusao } as Omit<ProgressoAula, "id">);
-                return true;
-            }}
-            renderActions={(item) => <ActionButton danger onClick={() => updateCollection("progressoAulas", (list) => list.filter((record) => !(record.idUsuario === item.idUsuario && record.idAula === item.idAula)))}>Excluir</ActionButton>}
-        />
+        <>
+            <section className="panel">
+                <h1 className="h3 mb-2">Progresso</h1>
+                <p className="text-muted mb-0">Selecione um aluno e marque as aulas concluídas em cada curso.</p>
+            </section>
+            <section className="panel">
+                <div className="row g-3 align-items-end">
+                    <SelectInput
+                        label="Aluno"
+                        value={selectedUserId}
+                        required
+                        options={data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto }))}
+                        actionLabel="+ Aluno"
+                        onAction={() => quickCreateUser({ data, addWithId, notify })}
+                        onChange={setSelectedUserId}
+                    />
+                    <div className="col-12 col-md-6">
+                        <p className="progress-summary mb-0">
+                            {selectedUser ? `Aluno selecionado: ${selectedUser.nomeCompleto}` : "Nenhum aluno selecionado."}
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <section className="progress-tree">
+                {data.cursos.length === 0 ? (
+                    <div className="panel text-center text-muted">Nenhum curso cadastrado.</div>
+                ) : data.cursos.map((course) => {
+                    const modules = data.modulos.filter((module) => module.idCurso === course.id).sort((a, b) => a.ordem - b.ordem);
+                    const summary = courseProgress(course);
+                    return (
+                        <article className="panel course-progress" key={course.id}>
+                            <div className="course-progress-header">
+                                <div>
+                                    <h2 className="h5 mb-1">{course.titulo}</h2>
+                                    <p className="text-muted mb-0">{nameById(data.categorias, course.idCategoria, "nome")}</p>
+                                </div>
+                                <span className="progress-pill">{summary.done}/{summary.total} aulas</span>
+                            </div>
+                            {modules.length === 0 ? (
+                                <p className="text-muted mb-0">Nenhum módulo cadastrado neste curso.</p>
+                            ) : modules.map((module) => {
+                                const lessons = data.aulas.filter((lesson) => lesson.idModulo === module.id).sort((a, b) => a.ordem - b.ordem);
+                                return (
+                                    <div className="module-progress" key={module.id}>
+                                        <h3 className="h6 mb-2">{module.ordem}. {module.titulo}</h3>
+                                        {lessons.length === 0 ? (
+                                            <p className="text-muted mb-0">Nenhuma aula cadastrada neste módulo.</p>
+                                        ) : (
+                                            <div className="lesson-checklist">
+                                                {lessons.map((lesson) => (
+                                                    <label className="lesson-checkbox" key={lesson.id}>
+                                                        <input
+                                                            type="checkbox"
+                                                            disabled={!idUsuario}
+                                                            checked={idUsuario ? isLessonDone(lesson.id) : false}
+                                                            onChange={(event) => toggleLesson(lesson.id, event.target.checked)}
+                                                        />
+                                                        <span>
+                                                            <strong>{lesson.ordem}. {lesson.titulo}</strong>
+                                                            <small>{lesson.tipoConteudo} · {lesson.duracaoMinutos} min</small>
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </article>
+                    );
+                })}
+            </section>
+        </>
     );
 }
 

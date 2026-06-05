@@ -113,6 +113,72 @@ body {
     font-size: 2rem;
 }
 
+.progress-summary {
+    color: var(--brand-ink-soft);
+    font-weight: 600;
+}
+
+.progress-tree {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+}
+
+.course-progress-header {
+    align-items: flex-start;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.progress-pill {
+    background-color: rgba(15, 118, 110, 0.12);
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    border-radius: 999px;
+    color: #0f5f59;
+    font-weight: 700;
+    padding: 0.35rem 0.75rem;
+    white-space: nowrap;
+}
+
+.module-progress {
+    border-top: 1px solid var(--brand-line);
+    padding-top: 1rem;
+}
+
+.module-progress + .module-progress {
+    margin-top: 1rem;
+}
+
+.lesson-checklist {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.lesson-checkbox {
+    align-items: flex-start;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(233, 222, 205, 0.9);
+    border-radius: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.8rem;
+}
+
+.lesson-checkbox input {
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    width: 1.1rem;
+}
+
+.lesson-checkbox small {
+    color: var(--brand-ink-soft);
+    display: block;
+    margin-top: 0.15rem;
+}
+
 .floating-alert {
     left: 50%;
     max-width: min(92vw, 520px);
