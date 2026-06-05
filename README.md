@@ -1,4 +1,4 @@
-﻿# Plataforma de Cursos Online
+# Plataforma de Cursos Online
 
 Projeto acadêmico da disciplina de Tecnologias de Construção de Software.
 
@@ -10,8 +10,9 @@ Documentação base do professor:
 
 - HTML5
 - Bootstrap 5
-- React 18 via CDN
-- JavaScript puro
+- React 18
+- TypeScript
+- Vite
 - `localStorage` para persistência simples no navegador
 
 ## Estrutura principal
@@ -19,26 +20,16 @@ Documentação base do professor:
 ```text
 plataforma-cursos/
   index.html
-  pages/
-    categorias.html
-    cursos.html
-    usuarios.html
-    modulos.html
-    aulas.html
-    matriculas.html
-    progresso-aulas.html
-    avaliacoes.html
-    trilhas.html
-    trilha-cursos.html
-    certificados.html
-    planos.html
-    assinaturas.html
-    pagamentos.html
-  js/
-    reactApp.js
-    main.js
-    models/
-    storage/localStorage.js
+  package.json
+  src/
+    App.tsx
+    main.tsx
+    storage.ts
+    types.ts
+    utils.ts
+    components/
+      CrudPage.tsx
+      Layout.tsx
 ```
 
 ## Funcionalidades implementadas
@@ -69,24 +60,34 @@ plataforma-cursos/
 - Validação de campos obrigatórios em formulários.
 - Validação simples de e-mail.
 - Bloqueios simples de duplicidade em entidades chave.
-- Relacionamentos por ID entre entidades (usuário, curso, módulo, aula, plano, assinatura).
+- Relacionamentos por ID entre entidades.
 - Cálculo de aulas e horas em cursos com base nas aulas cadastradas.
-
-## Padrão de interface
-
-- Navbar React com navegação por módulos.
-- Dashboard com contadores principais.
-- Formulários inline e listagens como área principal.
-- Coluna `Ações` com botões diretos.
 
 ## Como executar
 
-1. Abra o `index.html` no navegador.
-2. Aguarde o carregamento dos scripts CDN do React, ReactDOM e Bootstrap.
-3. Navegue entre as telas pelo menu.
-4. Cadastre dados de exemplo.
+Instale as dependências:
 
-> Observação: a versão React atual não exige `npm install` nem etapa de build.
+```bash
+npm install
+```
+
+Rode o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+Abra a URL mostrada no terminal, normalmente:
+
+```text
+http://localhost:5173
+```
+
+Para validar o build de produção:
+
+```bash
+npm run build
+```
 
 ## Persistência de dados
 
@@ -101,7 +102,5 @@ localStorage.clear()
 ## Observações
 
 - Não usa backend.
-- Usa React por CDN para manter execução simples em ambiente acadêmico.
+- Usa React com TypeScript e Vite.
 - Projeto focado em implementação simples e didática.
-
-

@@ -4,26 +4,176 @@
     --brand-accent: #0f766e;
     --brand-card: #fffdf7;
     --brand-line: #e9decd;
+    --shadow-card: 0 12px 28px -22px rgba(31, 42, 68, 0.5);
 }
 
 body {
     min-height: 100vh;
     margin: 0;
-    background: linear-gradient(135deg, #f8f4eb 0%, #f2f6f8 100%);
+    background:
+        radial-gradient(circle at 8% 6%, rgba(245, 158, 11, 0.13) 0, transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(15, 118, 110, 0.15) 0, transparent 31%),
+        linear-gradient(135deg, #f8f4eb 0%, #f2f6f8 100%);
     color: var(--brand-ink);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.app-shell {
-    margin: 0 auto;
-    max-width: 1180px;
-    padding: 2rem 1rem;
+.app-nav {
+    background-color: rgba(255, 253, 247, 0.92);
+    border-bottom: 1px solid rgba(233, 222, 205, 0.9);
+    box-shadow: 0 16px 40px -28px rgba(27, 38, 59, 0.6);
+}
+
+.navbar .nav-link {
+    border-radius: 999px;
+    color: var(--brand-ink-soft);
+    font-weight: 600;
+    padding: 0.4rem 0.85rem;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus,
+.navbar .nav-link.active {
+    background-color: rgba(15, 118, 110, 0.14);
+    color: var(--brand-ink);
+}
+
+.dropdown-menu {
+    border: 1px solid var(--brand-line);
+    border-radius: 0.8rem;
+    box-shadow: var(--shadow-card);
+    padding: 0.45rem;
+}
+
+.dropdown-item {
+    border-radius: 0.55rem;
+    font-weight: 500;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item.active {
+    background-color: rgba(15, 118, 110, 0.12);
+    color: var(--brand-ink);
+}
+
+.app-main {
+    padding-bottom: 2.75rem;
+    padding-top: 2.75rem;
 }
 
 .panel {
     background: var(--brand-card);
     border: 1px solid var(--brand-line);
     border-radius: 1rem;
-    box-shadow: 0 12px 28px -22px rgba(31, 42, 68, 0.5);
-    padding: 2rem;
+    box-shadow: var(--shadow-card);
+    padding: 1.4rem;
+}
+
+.panel + .panel,
+.panel + .stats-grid,
+.stats-grid + .panel {
+    margin-top: 1.25rem;
+}
+
+.hero-panel {
+    padding: 2.25rem;
+    text-align: center;
+}
+
+.hero-panel p {
+    color: var(--brand-ink-soft);
+}
+
+.stats-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card {
+    background: var(--brand-card);
+    border: 1px solid var(--brand-line);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
+    color: var(--brand-ink);
+    padding: 1.35rem;
+    text-align: left;
+}
+
+.stat-card span {
+    color: var(--brand-ink-soft);
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.stat-card strong {
+    display: block;
+    font-size: 2rem;
+}
+
+.floating-alert {
+    left: 50%;
+    max-width: min(92vw, 520px);
+    position: fixed;
+    top: 1rem;
+    transform: translateX(-50%);
+    width: max-content;
+    z-index: 1080;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--brand-accent), #155e75);
+    border-color: transparent;
+    font-weight: 700;
+}
+
+.btn-outline-primary {
+    border-color: rgba(15, 118, 110, 0.45);
+    color: #0f5f59;
+}
+
+.form-label {
+    color: var(--brand-ink);
+    font-weight: 700;
+}
+
+.form-control,
+.form-select {
+    border-color: var(--brand-line);
+    border-radius: 0.75rem;
+}
+
+table thead th {
+    background-color: #ebe4d8 !important;
+    border-bottom: 1px solid #ded1be !important;
+    color: var(--brand-ink);
+    font-weight: 800;
+}
+
+.table > :not(caption) > * > * {
+    border-color: #e6dbcb;
+}
+
+@media (max-width: 900px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .app-main {
+        padding-bottom: 1.25rem;
+        padding-top: 1.25rem;
+    }
+
+    .hero-panel,
+    .panel {
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }
