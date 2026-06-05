@@ -139,6 +139,14 @@ body {
     font-weight: 700;
 }
 
+.field-heading {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
 .form-control,
 .form-select {
     border-color: var(--brand-line);

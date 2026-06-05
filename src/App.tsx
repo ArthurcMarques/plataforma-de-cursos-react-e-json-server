@@ -257,8 +257,8 @@ function CoursesPage({ data, addWithId, removeById, notify, navigate }: PageProp
             fields={[
                 { name: "titulo", label: "Título", required: true },
                 { name: "nivel", label: "Nível", type: "select", required: true, options: ["Iniciante", "Intermediário", "Avançado"].map((level) => ({ value: level, label: level })) },
-                { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })) },
-                { name: "idInstrutor", label: "Instrutor", type: "select", required: true, options: instructors.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+                { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Categoria", onAction: () => quickCreateCategory({ data, addWithId, notify }) },
+                { name: "idInstrutor", label: "Instrutor", type: "select", required: true, options: instructors.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Instrutor", onAction: () => quickCreateUser({ data, addWithId, notify }, "Instrutor") },
                 { name: "dataPublicacao", label: "Data de publicação", type: "date", required: true },
                 { name: "descricao", label: "Descrição", type: "textarea", col: "col-12", required: true }
             ]}
@@ -308,7 +308,7 @@ function ModulesPage({ data, addWithId, removeById, notify }: PageProps) {
             description="Organize módulos dentro dos cursos."
             initialValues={{ idCurso: "", titulo: "", ordem: "" }}
             fields={[
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
                 { name: "titulo", label: "Título", required: true },
                 { name: "ordem", label: "Ordem", type: "number", min: 1, required: true }
             ]}
@@ -350,7 +350,7 @@ function LessonsPage({ data, addWithId, removeById, notify }: PageProps) {
             description="Cadastre aulas dentro dos módulos."
             initialValues={{ idModulo: "", titulo: "", tipoConteudo: "", urlConteudo: "", duracaoMinutos: "", ordem: "" }}
             fields={[
-                { name: "idModulo", label: "Módulo", type: "select", required: true, options: data.modulos.map((item) => ({ value: item.id, label: `${nameById(data.cursos, item.idCurso, "titulo")} - ${item.titulo}` })) },
+                { name: "idModulo", label: "Módulo", type: "select", required: true, options: data.modulos.map((item) => ({ value: item.id, label: `${nameById(data.cursos, item.idCurso, "titulo")} - ${item.titulo}` })), actionLabel: "+ Módulo", onAction: () => quickCreateModule({ data, addWithId, notify }) },
                 { name: "titulo", label: "Título", required: true },
                 { name: "tipoConteudo", label: "Tipo", type: "select", required: true, options: ["Vídeo", "Texto", "Quiz"].map((type) => ({ value: type, label: type })) },
                 { name: "duracaoMinutos", label: "Duração em minutos", type: "number", min: 1, required: true },
@@ -418,7 +418,7 @@ function TracksPage({ data, addWithId, removeById, updateCollection, notify }: P
                 initialValues={{ titulo: "", descricao: "", idCategoria: "" }}
                 fields={[
                     { name: "titulo", label: "Título", required: true },
-                    { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })) },
+                    { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Categoria", onAction: () => quickCreateCategory({ data, addWithId, notify }) },
                     { name: "descricao", label: "Descrição", type: "textarea", col: "col-12" }
                 ]}
                 columns={[
@@ -437,8 +437,8 @@ function TracksPage({ data, addWithId, removeById, updateCollection, notify }: P
             <section className="panel">
                 <h2 className="h5 mb-3">Cursos da trilha</h2>
                 <form className="row g-3" onSubmit={submitLink}>
-                    <SelectInput label="Trilha" value={linkForm.idTrilha} required options={data.trilhas.map((item) => ({ value: item.id, label: item.titulo }))} onChange={(value) => setLinkForm((current) => ({ ...current, idTrilha: value }))} />
-                    <SelectInput label="Curso" value={linkForm.idCurso} required options={data.cursos.map((item) => ({ value: item.id, label: item.titulo }))} onChange={(value) => setLinkForm((current) => ({ ...current, idCurso: value }))} />
+                    <SelectInput label="Trilha" value={linkForm.idTrilha} required options={data.trilhas.map((item) => ({ value: item.id, label: item.titulo }))} actionLabel="+ Trilha" onAction={() => quickCreateTrack({ data, addWithId, notify })} onChange={(value) => setLinkForm((current) => ({ ...current, idTrilha: value }))} />
+                    <SelectInput label="Curso" value={linkForm.idCurso} required options={data.cursos.map((item) => ({ value: item.id, label: item.titulo }))} actionLabel="+ Curso" onAction={() => quickCreateCourse({ data, addWithId, notify })} onChange={(value) => setLinkForm((current) => ({ ...current, idCurso: value }))} />
                     <TextInput label="Ordem" value={linkForm.ordem} required type="number" onChange={(value) => setLinkForm((current) => ({ ...current, ordem: value }))} />
                     <div className="col-12"><button className="btn btn-primary" type="submit">Vincular</button></div>
                 </form>
@@ -466,8 +466,8 @@ function EnrollmentsPage({ data, addWithId, removeById, notify }: PageProps) {
             description="Simule a matrícula de usuários em cursos."
             initialValues={{ idUsuario: "", idCurso: "", dataMatricula: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
                 { name: "dataMatricula", label: "Data", type: "date", required: true }
             ]}
             columns={[
@@ -501,8 +501,8 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
             description="Registre conclusão ou andamento das aulas."
             initialValues={{ idUsuario: "", idAula: "", status: "Concluído", dataConclusao: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
-                { name: "idAula", label: "Aula", type: "select", required: true, options: data.aulas.map((item) => ({ value: item.id, label: item.titulo })) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
+                { name: "idAula", label: "Aula", type: "select", required: true, options: data.aulas.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Aula", onAction: () => quickCreateLesson({ data, addWithId, notify }) },
                 { name: "status", label: "Status", type: "select", required: true, options: [{ value: "Concluído", label: "Concluído" }, { value: "Em andamento", label: "Em andamento" }] },
                 { name: "dataConclusao", label: "Data", type: "date", required: true }
             ]}
@@ -530,7 +530,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
     );
 }
 
-function ReviewsPage({ data, addWithId, removeById }: PageProps) {
+function ReviewsPage({ data, addWithId, removeById, notify }: PageProps) {
     const rows = data.avaliacoes.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     return (
@@ -539,8 +539,8 @@ function ReviewsPage({ data, addWithId, removeById }: PageProps) {
             description="Registre avaliações de usuários para os cursos."
             initialValues={{ idUsuario: "", idCurso: "", nota: "", comentario: "", dataAvaliacao: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
                 { name: "nota", label: "Nota", type: "select", required: true, options: [1, 2, 3, 4, 5].map((item) => ({ value: item, label: String(item) })) },
                 { name: "dataAvaliacao", label: "Data", type: "date", required: true },
                 { name: "comentario", label: "Comentário", type: "textarea", col: "col-12" }
@@ -563,7 +563,7 @@ function ReviewsPage({ data, addWithId, removeById }: PageProps) {
     );
 }
 
-function CertificatesPage({ data, updateCollection, notify }: PageProps) {
+function CertificatesPage({ data, addWithId, updateCollection, notify }: PageProps) {
     const rows = data.certificados.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     function hasCompletedProgress(idUsuario: number, idCurso: number) {
@@ -578,8 +578,8 @@ function CertificatesPage({ data, updateCollection, notify }: PageProps) {
             description="Gere certificados para usuários com progresso concluído no curso."
             initialValues={{ idUsuario: "", idCurso: "", dataEmissao: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
                 { name: "dataEmissao", label: "Data de emissão", type: "date", required: true }
             ]}
             columns={[
@@ -613,7 +613,7 @@ function CertificatesPage({ data, updateCollection, notify }: PageProps) {
     );
 }
 
-function SubscriptionsPage({ data, addWithId, removeById }: PageProps) {
+function SubscriptionsPage({ data, addWithId, removeById, notify }: PageProps) {
     const rows = data.assinaturas.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), planoNome: nameById(data.planos, item.idPlano, "nome") }));
 
     return (
@@ -622,8 +622,8 @@ function SubscriptionsPage({ data, addWithId, removeById }: PageProps) {
             description="Vincule usuários a planos por período."
             initialValues={{ idUsuario: "", idPlano: "", dataInicio: todayISO(), dataFim: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
-                { name: "idPlano", label: "Plano", type: "select", required: true, options: data.planos.map((item) => ({ value: item.id, label: item.nome })) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
+                { name: "idPlano", label: "Plano", type: "select", required: true, options: data.planos.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Plano", onAction: () => quickCreatePlan({ data, addWithId, notify }) },
                 { name: "dataInicio", label: "Início", type: "date", required: true },
                 { name: "dataFim", label: "Fim", type: "date", required: true }
             ]}
@@ -653,7 +653,7 @@ function PaymentsPage({ data, addWithId, removeById, notify }: PageProps) {
             description="Registre pagamentos simulados para assinaturas."
             initialValues={{ idAssinatura: "", valorPago: "", dataPagamento: todayISO(), metodoPagamento: "", idTransacaoGateway: "" }}
             fields={[
-                { name: "idAssinatura", label: "Assinatura", type: "select", required: true, options: data.assinaturas.map((item) => ({ value: item.id, label: subscriptionDescription(data, item.id) })) },
+                { name: "idAssinatura", label: "Assinatura", type: "select", required: true, options: data.assinaturas.map((item) => ({ value: item.id, label: subscriptionDescription(data, item.id) })), actionLabel: "+ Assinatura", onAction: () => quickCreateSubscription({ data, addWithId, notify }) },
                 { name: "valorPago", label: "Valor pago", type: "number", min: 0, step: "0.01", required: true },
                 { name: "dataPagamento", label: "Data", type: "date", required: true },
                 { name: "metodoPagamento", label: "Método", type: "select", required: true, options: ["Cartão", "Pix", "Boleto"].map((item) => ({ value: item, label: item })) },
@@ -713,20 +713,206 @@ function money(value: number) {
     return `R$ ${Number(value).toFixed(2)}`;
 }
 
+function promptRequired(label: string) {
+    const value = window.prompt(label)?.trim() ?? "";
+    return value;
+}
+
+function promptNumber(label: string, fallback = "1") {
+    const value = Number(window.prompt(label, fallback));
+    return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function promptChoice<T extends { id: number }>(title: string, list: T[], label: (item: T) => string) {
+    if (list.length === 0) {
+        return null;
+    }
+
+    const options = list.map((item) => `${item.id} - ${label(item)}`).join("\n");
+    const value = Number(window.prompt(`${title}\n${options}`));
+    const exists = list.some((item) => Number(item.id) === value);
+    return exists ? value : null;
+}
+
+type QuickCreateProps = Pick<PageProps, "data" | "addWithId" | "notify">;
+
+function quickCreateCategory({ data, addWithId, notify }: QuickCreateProps) {
+    const nome = promptRequired("Nome da categoria");
+    if (!nome) {
+        return;
+    }
+    if (data.categorias.some((item) => normalize(item.nome) === normalize(nome))) {
+        notify("Já existe uma categoria com esse nome.", "danger");
+        return;
+    }
+    const descricao = window.prompt("Descrição da categoria", "")?.trim() ?? "";
+    addWithId("categorias", { nome, descricao });
+}
+
+function quickCreateUser({ data, addWithId, notify }: QuickCreateProps, tipoUsuario: Usuario["tipoUsuario"] = "Aluno") {
+    const nomeCompleto = promptRequired(`Nome completo do ${tipoUsuario.toLowerCase()}`);
+    if (!nomeCompleto) {
+        return;
+    }
+    const email = normalize(promptRequired("E-mail"));
+    if (!email) {
+        return;
+    }
+    if (data.usuarios.some((item) => normalize(item.email) === email)) {
+        notify("Já existe um usuário com esse e-mail.", "danger");
+        return;
+    }
+    const senha = promptRequired("Senha");
+    if (!senha) {
+        return;
+    }
+    addWithId("usuarios", { nomeCompleto, email, senha, dataCadastro: todayISO(), tipoUsuario });
+}
+
+function quickCreatePlan({ data, addWithId, notify }: QuickCreateProps) {
+    const nome = promptRequired("Nome do plano");
+    if (!nome) {
+        return;
+    }
+    if (data.planos.some((item) => normalize(item.nome) === normalize(nome))) {
+        notify("Já existe um plano com esse nome.", "danger");
+        return;
+    }
+    const preco = Number(window.prompt("Preço do plano", "0"));
+    const duracaoMeses = Number(window.prompt("Duração em meses", "1"));
+    if (!Number.isFinite(preco) || preco < 0 || !Number.isFinite(duracaoMeses) || duracaoMeses <= 0) {
+        notify("Informe preço e duração válidos.", "danger");
+        return;
+    }
+    const descricao = window.prompt("Descrição do plano", "")?.trim() ?? "";
+    addWithId("planos", { nome, descricao, preco, duracaoMeses });
+}
+
+function quickCreateCourse(props: QuickCreateProps) {
+    const { data, addWithId, notify } = props;
+    const instructors = data.usuarios.filter((user) => user.tipoUsuario === "Instrutor");
+    if (!data.categorias.length || !instructors.length) {
+        notify("Crie ao menos uma categoria e um instrutor antes do curso.", "danger");
+        return;
+    }
+    const titulo = promptRequired("Título do curso");
+    if (!titulo) {
+        return;
+    }
+    const idCategoria = promptChoice("Escolha a categoria pelo ID", data.categorias, (item) => item.nome);
+    const idInstrutor = promptChoice("Escolha o instrutor pelo ID", instructors, (item) => item.nomeCompleto);
+    if (!idCategoria || !idInstrutor) {
+        notify("Categoria ou instrutor inválido.", "danger");
+        return;
+    }
+    const nivel = window.prompt("Nível: Iniciante, Intermediário ou Avançado", "Iniciante") as Curso["nivel"] | null;
+    if (!nivel || !["Iniciante", "Intermediário", "Avançado"].includes(nivel)) {
+        notify("Nível inválido.", "danger");
+        return;
+    }
+    const descricao = window.prompt("Descrição do curso", "")?.trim() ?? "";
+    addWithId("cursos", { titulo, descricao, nivel, idCategoria, idInstrutor, dataPublicacao: todayISO(), totalAulas: 0, totalHoras: 0 });
+}
+
+function quickCreateModule(props: QuickCreateProps) {
+    const { data, addWithId, notify } = props;
+    if (!data.cursos.length) {
+        notify("Crie um curso antes do módulo.", "danger");
+        return;
+    }
+    const idCurso = promptChoice("Escolha o curso pelo ID", data.cursos, (item) => item.titulo);
+    const titulo = promptRequired("Título do módulo");
+    const ordem = promptNumber("Ordem do módulo");
+    if (!idCurso || !titulo || !ordem) {
+        notify("Dados do módulo inválidos.", "danger");
+        return;
+    }
+    if (data.modulos.some((item) => item.idCurso === idCurso && item.ordem === ordem)) {
+        notify("Já existe um módulo com essa ordem neste curso.", "danger");
+        return;
+    }
+    addWithId("modulos", { idCurso, titulo, ordem });
+}
+
+function quickCreateLesson(props: QuickCreateProps) {
+    const { data, addWithId, notify } = props;
+    if (!data.modulos.length) {
+        notify("Crie um módulo antes da aula.", "danger");
+        return;
+    }
+    const idModulo = promptChoice("Escolha o módulo pelo ID", data.modulos, (item) => item.titulo);
+    const titulo = promptRequired("Título da aula");
+    const tipoConteudo = window.prompt("Tipo: Vídeo, Texto ou Quiz", "Vídeo") as Aula["tipoConteudo"] | null;
+    const duracaoMinutos = promptNumber("Duração em minutos");
+    const ordem = promptNumber("Ordem da aula");
+    if (!idModulo || !titulo || !tipoConteudo || !["Vídeo", "Texto", "Quiz"].includes(tipoConteudo) || !duracaoMinutos || !ordem) {
+        notify("Dados da aula inválidos.", "danger");
+        return;
+    }
+    if (data.aulas.some((item) => item.idModulo === idModulo && item.ordem === ordem)) {
+        notify("Já existe uma aula com essa ordem neste módulo.", "danger");
+        return;
+    }
+    const urlConteudo = window.prompt("URL do conteúdo", "")?.trim() ?? "";
+    addWithId("aulas", { idModulo, titulo, tipoConteudo, urlConteudo, duracaoMinutos, ordem });
+}
+
+function quickCreateTrack(props: QuickCreateProps) {
+    const { data, addWithId, notify } = props;
+    if (!data.categorias.length) {
+        notify("Crie uma categoria antes da trilha.", "danger");
+        return;
+    }
+    const titulo = promptRequired("Título da trilha");
+    const idCategoria = promptChoice("Escolha a categoria pelo ID", data.categorias, (item) => item.nome);
+    if (!titulo || !idCategoria) {
+        notify("Dados da trilha inválidos.", "danger");
+        return;
+    }
+    const descricao = window.prompt("Descrição da trilha", "")?.trim() ?? "";
+    addWithId("trilhas", { titulo, descricao, idCategoria });
+}
+
+function quickCreateSubscription(props: QuickCreateProps) {
+    const { data, addWithId, notify } = props;
+    if (!data.usuarios.length || !data.planos.length) {
+        notify("Crie ao menos um usuário e um plano antes da assinatura.", "danger");
+        return;
+    }
+    const idUsuario = promptChoice("Escolha o usuário pelo ID", data.usuarios, (item) => item.nomeCompleto);
+    const idPlano = promptChoice("Escolha o plano pelo ID", data.planos, (item) => item.nome);
+    if (!idUsuario || !idPlano) {
+        notify("Usuário ou plano inválido.", "danger");
+        return;
+    }
+    const dataInicio = window.prompt("Data de início", todayISO())?.trim() || todayISO();
+    const dataFim = window.prompt("Data de fim", todayISO())?.trim() || todayISO();
+    addWithId("assinaturas", { idUsuario, idPlano, dataInicio, dataFim });
+}
+
 function ActionButton({ children, danger = false, onClick }: { children: string; danger?: boolean; onClick: () => void }) {
     return <button className={`btn btn-sm btn-${danger ? "outline-danger" : "outline-secondary"}`} type="button" onClick={onClick}>{children}</button>;
 }
 
-function SelectInput({ label, value, options, required, onChange }: {
+function SelectInput({ label, value, options, required, actionLabel, onAction, onChange }: {
     label: string;
     value: string;
     options: Array<{ value: string | number; label: string }>;
     required?: boolean;
+    actionLabel?: string;
+    onAction?: () => void;
     onChange: (value: string) => void;
 }) {
     return (
         <div className="col-12 col-md-6">
-            <label className="form-label">{label}</label>
+            <div className="field-heading">
+                <label className="form-label mb-0">{label}</label>
+                {onAction && actionLabel && (
+                    <button className="btn btn-sm btn-outline-primary" type="button" onClick={onAction}>
+                        {actionLabel}
+                    </button>
+                )}
+            </div>
             <select className="form-select" value={value} required={required} onChange={(event) => onChange(event.target.value)}>
                 <option value="">Selecione</option>
                 {options.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
