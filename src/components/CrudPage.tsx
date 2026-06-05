@@ -34,6 +34,8 @@ interface CrudPageProps<TForm extends Record<string, string>, TRow extends objec
     rows: TRow[];
     emptyText: string;
     onSubmit: (form: TForm) => boolean | void;
+    getEditValues?: (row: TRow) => TForm;
+    onUpdate?: (row: TRow, form: TForm) => boolean | void;
     renderActions?: (row: TRow) => ReactNode;
     getRowKey?: (row: TRow) => string | number;
 }
@@ -47,10 +49,13 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
     rows,
     emptyText,
     onSubmit,
+    getEditValues,
+    onUpdate,
     renderActions,
     getRowKey
 }: CrudPageProps<TForm, TRow>) {
     const [form, setForm] = useState<TForm>(initialValues);
+    const [editingRow, setEditingRow] = useState<TRow | null>(null);
 
     function change(name: keyof TForm & string, value: string) {
         setForm((current) => ({ ...current, [name]: value }));
@@ -58,10 +63,39 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const saved = onSubmit(form);
+        const saved = editingRow && onUpdate ? onUpdate(editingRow, form) : onSubmit(form);
         if (saved !== false) {
-            setForm(initialValues);
+            resetForm();
         }
+    }
+
+    function startEdit(row: TRow) {
+        if (!getEditValues) {
+            return;
+        }
+
+        setEditingRow(row);
+        setForm(getEditValues(row));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetForm() {
+        setEditingRow(null);
+        setForm(initialValues);
+    }
+
+    function renderRowActions(row: TRow) {
+        const customActions = renderActions ? renderActions(row) : null;
+        if (!getEditValues || !onUpdate) {
+            return customActions;
+        }
+
+        return (
+            <div className="d-flex justify-content-center gap-2 flex-wrap">
+                <button className="btn btn-sm btn-outline-primary" type="button" onClick={() => startEdit(row)}>Editar</button>
+                {customActions}
+            </div>
+        );
     }
 
     return (
@@ -71,17 +105,18 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
                 <p className="text-muted mb-0">{description}</p>
             </section>
             <section className="panel">
+                {editingRow && <p className="edit-banner">Editando registro. Salve as alterações ou limpe o formulário para cancelar.</p>}
                 <form className="row g-3" onSubmit={submit}>
                     {fields.map((field) => (
                         <FormField field={field} value={form[field.name] ?? ""} onChange={change} key={field.name} />
                     ))}
                     <div className="col-12 d-flex gap-2">
-                        <button className="btn btn-primary" type="submit">Salvar</button>
-                        <button className="btn btn-outline-secondary" type="button" onClick={() => setForm(initialValues)}>Limpar</button>
+                        <button className="btn btn-primary" type="submit">{editingRow ? "Salvar alterações" : "Salvar"}</button>
+                        <button className="btn btn-outline-secondary" type="button" onClick={resetForm}>{editingRow ? "Cancelar" : "Limpar"}</button>
                     </div>
                 </form>
             </section>
-            <DataTable columns={columns} rows={rows} emptyText={emptyText} renderActions={renderActions} getRowKey={getRowKey} />
+            <DataTable columns={columns} rows={rows} emptyText={emptyText} renderActions={renderRowActions} getRowKey={getRowKey} />
         </>
     );
 }

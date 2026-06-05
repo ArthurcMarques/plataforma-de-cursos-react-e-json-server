@@ -79,7 +79,16 @@ export function App() {
         notify("Registro removido com sucesso.", "warning");
     }
 
-    const props: PageProps = { data, addWithId, removeById, updateCollection, notify, navigate: setCurrentSection };
+    function updateById<K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) {
+        updateCollection(name, (list) => {
+            return (list as unknown as WithId[]).map((item) => {
+                return Number(item.id) === Number(id) ? { ...item, ...patch } : item;
+            }) as unknown as AppData[K];
+        });
+        notify("Registro atualizado com sucesso.");
+    }
+
+    const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: setCurrentSection };
 
     return (
         <>
@@ -94,6 +103,7 @@ export function App() {
 interface PageProps {
     data: AppData;
     addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => void;
+    updateById: <K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) => void;
     removeById: <K extends CollectionName>(name: K, id: number) => void;
     updateCollection: <K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) => void;
     notify: (message: string, type?: "success" | "warning" | "danger") => void;
@@ -148,7 +158,7 @@ function DashboardPage({ data, navigate }: PageProps) {
     );
 }
 
-function CategoriesPage({ data, addWithId, removeById, notify }: PageProps) {
+function CategoriesPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage
             title="Categorias"
@@ -172,12 +182,22 @@ function CategoriesPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("categorias", { nome: form.nome.trim(), descricao: form.descricao.trim() });
                 return true;
             }}
+            getEditValues={(item) => ({ nome: item.nome, descricao: item.descricao })}
+            onUpdate={(item, form) => {
+                const nome = form.nome.trim();
+                if (data.categorias.some((category) => category.id !== item.id && normalize(category.nome) === normalize(nome))) {
+                    notify("Já existe uma categoria com esse nome.", "danger");
+                    return false;
+                }
+                updateById("categorias", item.id, { nome, descricao: form.descricao.trim() });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("categorias", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function UsersPage({ data, addWithId, removeById, notify }: PageProps) {
+function UsersPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage
             title="Usuários"
@@ -206,12 +226,28 @@ function UsersPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("usuarios", { ...form, email: normalize(form.email), tipoUsuario: form.tipoUsuario as Usuario["tipoUsuario"] });
                 return true;
             }}
+            getEditValues={(item) => ({
+                nomeCompleto: item.nomeCompleto,
+                email: item.email,
+                senha: item.senha,
+                dataCadastro: item.dataCadastro,
+                tipoUsuario: item.tipoUsuario
+            })}
+            onUpdate={(item, form) => {
+                const email = normalize(form.email);
+                if (data.usuarios.some((user) => user.id !== item.id && normalize(user.email) === email)) {
+                    notify("Já existe um usuário com esse e-mail.", "danger");
+                    return false;
+                }
+                updateById("usuarios", item.id, { ...form, email, tipoUsuario: form.tipoUsuario as Usuario["tipoUsuario"] });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("usuarios", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function PlansPage({ data, addWithId, removeById, notify }: PageProps) {
+function PlansPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage
             title="Planos"
@@ -239,12 +275,26 @@ function PlansPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("planos", { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracaoMeses: Number(form.duracaoMeses) });
                 return true;
             }}
+            getEditValues={(item) => ({
+                nome: item.nome,
+                descricao: item.descricao,
+                preco: String(item.preco),
+                duracaoMeses: String(item.duracaoMeses)
+            })}
+            onUpdate={(item, form) => {
+                if (data.planos.some((plan) => plan.id !== item.id && normalize(plan.nome) === normalize(form.nome))) {
+                    notify("Já existe um plano com esse nome.", "danger");
+                    return false;
+                }
+                updateById("planos", item.id, { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracaoMeses: Number(form.duracaoMeses) });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("planos", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function CoursesPage({ data, addWithId, removeById, notify, navigate }: PageProps) {
+function CoursesPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     const instructors = data.usuarios.filter((user) => user.tipoUsuario === "Instrutor");
     const rows = data.cursos.map((course) => courseSummary(data, course));
 
@@ -288,6 +338,25 @@ function CoursesPage({ data, addWithId, removeById, notify, navigate }: PageProp
                 });
                 return true;
             }}
+            getEditValues={(item) => ({
+                titulo: item.titulo,
+                descricao: item.descricao,
+                nivel: item.nivel,
+                idCategoria: String(item.idCategoria),
+                idInstrutor: String(item.idInstrutor),
+                dataPublicacao: item.dataPublicacao
+            })}
+            onUpdate={(item, form) => {
+                updateById("cursos", item.id, {
+                    titulo: form.titulo.trim(),
+                    descricao: form.descricao.trim(),
+                    nivel: form.nivel as Curso["nivel"],
+                    idCategoria: Number(form.idCategoria),
+                    idInstrutor: Number(form.idInstrutor),
+                    dataPublicacao: form.dataPublicacao
+                });
+                return true;
+            }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2">
                     <ActionButton onClick={() => navigate("modulos")}>Módulos</ActionButton>
@@ -298,7 +367,7 @@ function CoursesPage({ data, addWithId, removeById, notify, navigate }: PageProp
     );
 }
 
-function ModulesPage({ data, addWithId, removeById, notify }: PageProps) {
+function ModulesPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.modulos.map((item) => ({ ...item, cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     return (
@@ -328,12 +397,23 @@ function ModulesPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("modulos", { idCurso, titulo: form.titulo.trim(), ordem });
                 return true;
             }}
+            getEditValues={(item) => ({ idCurso: String(item.idCurso), titulo: item.titulo, ordem: String(item.ordem) })}
+            onUpdate={(item, form) => {
+                const idCurso = Number(form.idCurso);
+                const ordem = Number(form.ordem);
+                if (data.modulos.some((module) => module.id !== item.id && module.idCurso === idCurso && Number(module.ordem) === ordem)) {
+                    notify("Já existe um módulo com essa ordem neste curso.", "danger");
+                    return false;
+                }
+                updateById("modulos", item.id, { idCurso, titulo: form.titulo.trim(), ordem });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("modulos", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function LessonsPage({ data, addWithId, removeById, notify }: PageProps) {
+function LessonsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.aulas.map((lesson) => {
         const module = data.modulos.find((item) => item.id === lesson.idModulo);
         return {
@@ -383,12 +463,37 @@ function LessonsPage({ data, addWithId, removeById, notify }: PageProps) {
                 });
                 return true;
             }}
+            getEditValues={(item) => ({
+                idModulo: String(item.idModulo),
+                titulo: item.titulo,
+                tipoConteudo: item.tipoConteudo,
+                urlConteudo: item.urlConteudo,
+                duracaoMinutos: String(item.duracaoMinutos),
+                ordem: String(item.ordem)
+            })}
+            onUpdate={(item, form) => {
+                const idModulo = Number(form.idModulo);
+                const ordem = Number(form.ordem);
+                if (data.aulas.some((lesson) => lesson.id !== item.id && lesson.idModulo === idModulo && Number(lesson.ordem) === ordem)) {
+                    notify("Já existe uma aula com essa ordem neste módulo.", "danger");
+                    return false;
+                }
+                updateById("aulas", item.id, {
+                    idModulo,
+                    titulo: form.titulo.trim(),
+                    tipoConteudo: form.tipoConteudo as Aula["tipoConteudo"],
+                    urlConteudo: form.urlConteudo.trim(),
+                    duracaoMinutos: Number(form.duracaoMinutos),
+                    ordem
+                });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("aulas", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function TracksPage({ data, addWithId, removeById, updateCollection, notify }: PageProps) {
+function TracksPage({ data, addWithId, updateById, removeById, updateCollection, notify }: PageProps) {
     const [linkForm, setLinkForm] = useState({ idTrilha: "", idCurso: "", ordem: "" });
     const links = data.trilhasCursos.map((item) => ({
         ...item,
@@ -431,6 +536,15 @@ function TracksPage({ data, addWithId, removeById, updateCollection, notify }: P
                     addWithId("trilhas", { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
                     return true;
                 }}
+                getEditValues={(item) => ({
+                    titulo: item.titulo,
+                    descricao: item.descricao,
+                    idCategoria: String(item.idCategoria)
+                })}
+                onUpdate={(item, form) => {
+                    updateById("trilhas", item.id, { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
+                    return true;
+                }}
                 renderActions={(item) => <ActionButton danger onClick={() => removeById("trilhas", item.id)}>Excluir</ActionButton>}
             />
             <section className="panel">
@@ -456,7 +570,7 @@ function TracksPage({ data, addWithId, removeById, updateCollection, notify }: P
     );
 }
 
-function EnrollmentsPage({ data, addWithId, removeById, notify }: PageProps) {
+function EnrollmentsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.matriculas.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     return (
@@ -484,6 +598,21 @@ function EnrollmentsPage({ data, addWithId, removeById, notify }: PageProps) {
                     return false;
                 }
                 addWithId("matriculas", { idUsuario, idCurso, dataMatricula: form.dataMatricula, dataConclusao: null });
+                return true;
+            }}
+            getEditValues={(item) => ({
+                idUsuario: String(item.idUsuario),
+                idCurso: String(item.idCurso),
+                dataMatricula: item.dataMatricula
+            })}
+            onUpdate={(item, form) => {
+                const idUsuario = Number(form.idUsuario);
+                const idCurso = Number(form.idCurso);
+                if (data.matriculas.some((enrollment) => enrollment.id !== item.id && enrollment.idUsuario === idUsuario && enrollment.idCurso === idCurso)) {
+                    notify("Esse usuário já está matriculado nesse curso.", "danger");
+                    return false;
+                }
+                updateById("matriculas", item.id, { idUsuario, idCurso, dataMatricula: form.dataMatricula });
                 return true;
             }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("matriculas", item.id)}>Excluir</ActionButton>}
@@ -602,7 +731,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
     );
 }
 
-function ReviewsPage({ data, addWithId, removeById, notify }: PageProps) {
+function ReviewsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.avaliacoes.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     return (
@@ -630,12 +759,29 @@ function ReviewsPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("avaliacoes", { idUsuario: Number(form.idUsuario), idCurso: Number(form.idCurso), nota: Number(form.nota), comentario: form.comentario.trim(), dataAvaliacao: form.dataAvaliacao });
                 return true;
             }}
+            getEditValues={(item) => ({
+                idUsuario: String(item.idUsuario),
+                idCurso: String(item.idCurso),
+                nota: String(item.nota),
+                comentario: item.comentario,
+                dataAvaliacao: item.dataAvaliacao
+            })}
+            onUpdate={(item, form) => {
+                updateById("avaliacoes", item.id, {
+                    idUsuario: Number(form.idUsuario),
+                    idCurso: Number(form.idCurso),
+                    nota: Number(form.nota),
+                    comentario: form.comentario.trim(),
+                    dataAvaliacao: form.dataAvaliacao
+                });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("avaliacoes", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function CertificatesPage({ data, addWithId, updateCollection, notify }: PageProps) {
+function CertificatesPage({ data, addWithId, updateById, updateCollection, notify }: PageProps) {
     const rows = data.certificados.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     function hasCompletedProgress(idUsuario: number, idCurso: number) {
@@ -680,12 +826,27 @@ function CertificatesPage({ data, addWithId, updateCollection, notify }: PagePro
                 notify("Certificado gerado com sucesso.");
                 return true;
             }}
+            getEditValues={(item) => ({
+                idUsuario: String(item.idUsuario),
+                idCurso: String(item.idCurso),
+                dataEmissao: item.dataEmissao
+            })}
+            onUpdate={(item, form) => {
+                const idUsuario = Number(form.idUsuario);
+                const idCurso = Number(form.idCurso);
+                if (data.certificados.some((certificate) => certificate.id !== item.id && certificate.idUsuario === idUsuario && certificate.idCurso === idCurso)) {
+                    notify("Já existe certificado para esse usuário nesse curso.", "danger");
+                    return false;
+                }
+                updateById("certificados", item.id, { idUsuario, idCurso, dataEmissao: form.dataEmissao });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => updateCollection("certificados", (list) => list.filter((record) => record.id !== item.id))}>Excluir</ActionButton>}
         />
     );
 }
 
-function SubscriptionsPage({ data, addWithId, removeById, notify }: PageProps) {
+function SubscriptionsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.assinaturas.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), planoNome: nameById(data.planos, item.idPlano, "nome") }));
 
     return (
@@ -711,12 +872,22 @@ function SubscriptionsPage({ data, addWithId, removeById, notify }: PageProps) {
                 addWithId("assinaturas", { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
                 return true;
             }}
+            getEditValues={(item) => ({
+                idUsuario: String(item.idUsuario),
+                idPlano: String(item.idPlano),
+                dataInicio: item.dataInicio,
+                dataFim: item.dataFim
+            })}
+            onUpdate={(item, form) => {
+                updateById("assinaturas", item.id, { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
+                return true;
+            }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("assinaturas", item.id)}>Excluir</ActionButton>}
         />
     );
 }
 
-function PaymentsPage({ data, addWithId, removeById, notify }: PageProps) {
+function PaymentsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.pagamentos.map((item) => ({ ...item, assinaturaNome: subscriptionDescription(data, item.idAssinatura) }));
 
     return (
@@ -746,6 +917,27 @@ function PaymentsPage({ data, addWithId, removeById, notify }: PageProps) {
                     return false;
                 }
                 addWithId("pagamentos", {
+                    idAssinatura: Number(form.idAssinatura),
+                    valorPago: Number(form.valorPago),
+                    dataPagamento: form.dataPagamento,
+                    metodoPagamento: form.metodoPagamento as Pagamento["metodoPagamento"],
+                    idTransacaoGateway: form.idTransacaoGateway.trim()
+                });
+                return true;
+            }}
+            getEditValues={(item) => ({
+                idAssinatura: String(item.idAssinatura),
+                valorPago: String(item.valorPago),
+                dataPagamento: item.dataPagamento,
+                metodoPagamento: item.metodoPagamento,
+                idTransacaoGateway: item.idTransacaoGateway
+            })}
+            onUpdate={(item, form) => {
+                if (data.pagamentos.some((payment) => payment.id !== item.id && normalize(payment.idTransacaoGateway) === normalize(form.idTransacaoGateway))) {
+                    notify("Já existe pagamento com esse ID de transação.", "danger");
+                    return false;
+                }
+                updateById("pagamentos", item.id, {
                     idAssinatura: Number(form.idAssinatura),
                     valorPago: Number(form.valorPago),
                     dataPagamento: form.dataPagamento,
