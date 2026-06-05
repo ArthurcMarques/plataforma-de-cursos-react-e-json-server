@@ -65,6 +65,8 @@ plataforma-cursos/
 
 ## Como executar
 
+> Esta versão usa Vite. Não abra o `index.html` diretamente pelo Explorador; rode o servidor local.
+
 Instale as dependências:
 
 ```bash
