@@ -1,4 +1,5 @@
 import type { AppData, CollectionName } from "./types";
+import { mockData } from "./mockData";
 
 export const storageKeys: Record<CollectionName, string> = {
     usuarios: "usuarios",
@@ -18,8 +19,17 @@ export const storageKeys: Record<CollectionName, string> = {
 };
 
 export function loadInitialData(): AppData {
+    const hasAnySavedData = (Object.keys(storageKeys) as CollectionName[]).some((name) => {
+        return localStorage.getItem(storageKeys[name]) !== null;
+    });
+
     return (Object.keys(storageKeys) as CollectionName[]).reduce((data, name) => {
-        return { ...data, [name]: loadList(storageKeys[name]) };
+        const list = hasAnySavedData ? loadCollection(name) : mockData[name];
+        if (!hasAnySavedData) {
+            saveCollection(name, list);
+        }
+
+        return { ...data, [name]: list };
     }, {} as AppData);
 }
 
@@ -27,12 +37,12 @@ export function saveCollection<K extends CollectionName>(name: K, list: AppData[
     localStorage.setItem(storageKeys[name], JSON.stringify(list));
 }
 
-function loadList<T>(key: string): T[] {
+function loadCollection<K extends CollectionName>(name: K): AppData[K] {
     try {
-        const saved = localStorage.getItem(key);
+        const saved = localStorage.getItem(storageKeys[name]);
         const parsed = saved ? JSON.parse(saved) : [];
-        return Array.isArray(parsed) ? parsed : [];
+        return (Array.isArray(parsed) ? parsed : []) as AppData[K];
     } catch {
-        return [];
+        return [] as unknown as AppData[K];
     }
 }

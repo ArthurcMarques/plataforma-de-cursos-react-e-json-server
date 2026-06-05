@@ -95,6 +95,8 @@ npm run build
 
 Os dados ficam salvos no `localStorage` do navegador.
 
+Quando o navegador ainda não tem dados da aplicação, a plataforma carrega uma base inicial mockada com usuários, categorias, cursos, módulos, aulas, matrícula, plano, assinatura e pagamento.
+
 Para limpar:
 
 ```js
