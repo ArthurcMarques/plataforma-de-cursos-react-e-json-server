@@ -14,8 +14,10 @@ export type CollectionName =
     | "assinaturas"
     | "pagamentos";
 
+export type RecordId = number | string;
+
 export interface Usuario {
-    id: number;
+    id: RecordId;
     nomeCompleto: string;
     email: string;
     senha: string;
@@ -24,13 +26,13 @@ export interface Usuario {
 }
 
 export interface Categoria {
-    id: number;
+    id: RecordId;
     nome: string;
     descricao: string;
 }
 
 export interface Curso {
-    id: number;
+    id: RecordId;
     titulo: string;
     descricao: string;
     nivel: "Iniciante" | "Intermediário" | "Avançado";
@@ -42,14 +44,14 @@ export interface Curso {
 }
 
 export interface Modulo {
-    id: number;
+    id: RecordId;
     idCurso: number;
     titulo: string;
     ordem: number;
 }
 
 export interface Aula {
-    id: number;
+    id: RecordId;
     idModulo: number;
     titulo: string;
     tipoConteudo: "Vídeo" | "Texto" | "Quiz";
@@ -59,7 +61,7 @@ export interface Aula {
 }
 
 export interface Matricula {
-    id: number;
+    id: RecordId;
     idUsuario: number;
     idCurso: number;
     dataMatricula: string;
@@ -67,7 +69,7 @@ export interface Matricula {
 }
 
 export interface ProgressoAula {
-    id: number;
+    id: RecordId;
     idUsuario: number;
     idAula: number;
     status: "Concluído" | "Em andamento";
@@ -75,7 +77,7 @@ export interface ProgressoAula {
 }
 
 export interface Avaliacao {
-    id: number;
+    id: RecordId;
     idUsuario: number;
     idCurso: number;
     nota: number;
@@ -84,21 +86,21 @@ export interface Avaliacao {
 }
 
 export interface Trilha {
-    id: number;
+    id: RecordId;
     titulo: string;
     descricao: string;
     idCategoria: number;
 }
 
 export interface TrilhaCurso {
-    id: number;
+    id: RecordId;
     idTrilha: number;
     idCurso: number;
     ordem: number;
 }
 
 export interface Certificado {
-    id: number;
+    id: RecordId;
     idUsuario: number;
     idCurso: number;
     idTrilha: number | null;
@@ -107,7 +109,7 @@ export interface Certificado {
 }
 
 export interface Plano {
-    id: number;
+    id: RecordId;
     nome: string;
     descricao: string;
     preco: number;
@@ -115,7 +117,7 @@ export interface Plano {
 }
 
 export interface Assinatura {
-    id: number;
+    id: RecordId;
     idUsuario: number;
     idPlano: number;
     dataInicio: string;
@@ -123,7 +125,7 @@ export interface Assinatura {
 }
 
 export interface Pagamento {
-    id: number;
+    id: RecordId;
     idAssinatura: number;
     valorPago: number;
     dataPagamento: string;

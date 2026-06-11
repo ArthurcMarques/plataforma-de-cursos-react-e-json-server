@@ -1,6 +1,6 @@
-import type { AppData, CollectionName } from "./types";
+import type { AppData, CollectionName, RecordId } from "./types";
 
-type WithId = { id: number };
+type WithId = { id: RecordId };
 
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
 
@@ -48,7 +48,7 @@ export async function createRecord<K extends CollectionName>(
 
 export async function updateRecord<K extends CollectionName>(
     name: K,
-    id: number,
+    id: RecordId,
     patch: Partial<AppData[K][number]>
 ): Promise<AppData[K][number]> {
     return request<AppData[K][number]>(`/${name}/${id}`, {
@@ -57,7 +57,7 @@ export async function updateRecord<K extends CollectionName>(
     });
 }
 
-export async function deleteRecord(name: CollectionName, id: number): Promise<void> {
+export async function deleteRecord(name: CollectionName, id: RecordId): Promise<void> {
     await request<void>(`/${name}/${id}`, { method: "DELETE" });
 }
 

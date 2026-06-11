@@ -16,11 +16,12 @@ import type {
     Modulo,
     Pagamento,
     Plano,
+    RecordId,
     Trilha,
     TrilhaCurso,
     Usuario
 } from "./types";
-import { nameById, nextId, normalize, todayISO } from "./utils";
+import { nameById, nextId, normalize, sameId, todayISO } from "./utils";
 
 const sections: SectionItem[] = [
     { id: "dashboard", name: "Início", group: "principal" },
@@ -40,7 +41,7 @@ const sections: SectionItem[] = [
 ];
 
 type AlertState = { message: string; type: "success" | "warning" | "danger" } | null;
-type WithId = { id: number };
+type WithId = { id: RecordId };
 
 export function App() {
     const [currentSection, setCurrentSection] = useState("dashboard");
@@ -71,12 +72,16 @@ export function App() {
     }
 
     async function updateCollection<K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) {
+        const previousList = data[name];
+        const updated = updater(previousList);
+        setData((current) => ({ ...current, [name]: updated }));
+
         try {
-            const updated = updater(data[name]);
-            const saved = await syncCollection(name, data[name], updated);
+            const saved = await syncCollection(name, previousList, updated);
             setData((current) => ({ ...current, [name]: saved }));
             return saved;
         } catch {
+            setData((current) => ({ ...current, [name]: previousList }));
             notify("Não foi possível salvar as alterações no servidor.", "danger");
             return undefined;
         }
@@ -92,24 +97,25 @@ export function App() {
         }
     }
 
-    async function removeById<K extends CollectionName>(name: K, id: number) {
+    async function removeById<K extends CollectionName>(name: K, id: RecordId) {
         if (!window.confirm("Deseja excluir este registro?")) {
             return;
         }
 
+        const previousList = data[name];
+        const updated = (previousList as unknown as WithId[]).filter((item) => Number(item.id) !== Number(id)) as unknown as AppData[K];
+        setData((current) => ({ ...current, [name]: updated }));
+
         try {
             await deleteRecord(name, id);
-            setData((current) => ({
-                ...current,
-                [name]: (current[name] as unknown as WithId[]).filter((item) => Number(item.id) !== Number(id)) as unknown as AppData[K]
-            }));
             notify("Registro removido com sucesso.", "warning");
         } catch {
+            setData((current) => ({ ...current, [name]: previousList }));
             notify("Não foi possível remover o registro no servidor.", "danger");
         }
     }
 
-    async function updateById<K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) {
+    async function updateById<K extends CollectionName>(name: K, id: RecordId, patch: Partial<AppData[K][number]>) {
         try {
             const saved = await updateRecord(name, id, patch);
             setData((current) => ({
@@ -148,8 +154,8 @@ export function App() {
 interface PageProps {
     data: AppData;
     addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => Promise<void>;
-    updateById: <K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) => Promise<void>;
-    removeById: <K extends CollectionName>(name: K, id: number) => Promise<void>;
+    updateById: <K extends CollectionName>(name: K, id: RecordId, patch: Partial<AppData[K][number]>) => Promise<void>;
+    removeById: <K extends CollectionName>(name: K, id: RecordId) => Promise<void>;
     updateCollection: <K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) => Promise<AppData[K] | undefined>;
     notify: (message: string, type?: "success" | "warning" | "danger") => void;
     navigate: (section: string) => void;
@@ -230,7 +236,7 @@ function CategoriesPage({ data, addWithId, updateById, removeById, notify }: Pag
             getEditValues={(item) => ({ nome: item.nome, descricao: item.descricao })}
             onUpdate={(item, form) => {
                 const nome = form.nome.trim();
-                if (data.categorias.some((category) => category.id !== item.id && normalize(category.nome) === normalize(nome))) {
+                if (data.categorias.some((category) => !sameId(category.id, item.id) && normalize(category.nome) === normalize(nome))) {
                     notify("Já existe uma categoria com esse nome.", "danger");
                     return false;
                 }
@@ -280,7 +286,7 @@ function UsersPage({ data, addWithId, updateById, removeById, notify }: PageProp
             })}
             onUpdate={(item, form) => {
                 const email = normalize(form.email);
-                if (data.usuarios.some((user) => user.id !== item.id && normalize(user.email) === email)) {
+                if (data.usuarios.some((user) => !sameId(user.id, item.id) && normalize(user.email) === email)) {
                     notify("Já existe um usuário com esse e-mail.", "danger");
                     return false;
                 }
@@ -327,7 +333,7 @@ function PlansPage({ data, addWithId, updateById, removeById, notify }: PageProp
                 duracaoMeses: String(item.duracaoMeses)
             })}
             onUpdate={(item, form) => {
-                if (data.planos.some((plan) => plan.id !== item.id && normalize(plan.nome) === normalize(form.nome))) {
+                if (data.planos.some((plan) => !sameId(plan.id, item.id) && normalize(plan.nome) === normalize(form.nome))) {
                     notify("Já existe um plano com esse nome.", "danger");
                     return false;
                 }
@@ -435,7 +441,7 @@ function ModulesPage({ data, addWithId, updateById, removeById, notify }: PagePr
             onSubmit={(form) => {
                 const idCurso = Number(form.idCurso);
                 const ordem = Number(form.ordem);
-                if (data.modulos.some((item) => item.idCurso === idCurso && Number(item.ordem) === ordem)) {
+                if (data.modulos.some((item) => sameId(item.idCurso, idCurso) && Number(item.ordem) === ordem)) {
                     notify("Já existe um módulo com essa ordem neste curso.", "danger");
                     return false;
                 }
@@ -446,7 +452,7 @@ function ModulesPage({ data, addWithId, updateById, removeById, notify }: PagePr
             onUpdate={(item, form) => {
                 const idCurso = Number(form.idCurso);
                 const ordem = Number(form.ordem);
-                if (data.modulos.some((module) => module.id !== item.id && module.idCurso === idCurso && Number(module.ordem) === ordem)) {
+                if (data.modulos.some((module) => !sameId(module.id, item.id) && sameId(module.idCurso, idCurso) && Number(module.ordem) === ordem)) {
                     notify("Já existe um módulo com essa ordem neste curso.", "danger");
                     return false;
                 }
@@ -460,7 +466,7 @@ function ModulesPage({ data, addWithId, updateById, removeById, notify }: PagePr
 
 function LessonsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     const rows = data.aulas.map((lesson) => {
-        const module = data.modulos.find((item) => item.id === lesson.idModulo);
+        const module = data.modulos.find((item) => sameId(item.id, lesson.idModulo));
         return {
             ...lesson,
             moduloNome: module?.titulo ?? "-",
@@ -494,7 +500,7 @@ function LessonsPage({ data, addWithId, updateById, removeById, notify }: PagePr
             onSubmit={(form) => {
                 const idModulo = Number(form.idModulo);
                 const ordem = Number(form.ordem);
-                if (data.aulas.some((item) => item.idModulo === idModulo && Number(item.ordem) === ordem)) {
+                if (data.aulas.some((item) => sameId(item.idModulo, idModulo) && Number(item.ordem) === ordem)) {
                     notify("Já existe uma aula com essa ordem neste módulo.", "danger");
                     return false;
                 }
@@ -519,7 +525,7 @@ function LessonsPage({ data, addWithId, updateById, removeById, notify }: PagePr
             onUpdate={(item, form) => {
                 const idModulo = Number(form.idModulo);
                 const ordem = Number(form.ordem);
-                if (data.aulas.some((lesson) => lesson.id !== item.id && lesson.idModulo === idModulo && Number(lesson.ordem) === ordem)) {
+                if (data.aulas.some((lesson) => !sameId(lesson.id, item.id) && sameId(lesson.idModulo, idModulo) && Number(lesson.ordem) === ordem)) {
                     notify("Já existe uma aula com essa ordem neste módulo.", "danger");
                     return false;
                 }
@@ -550,7 +556,7 @@ function TracksPage({ data, addWithId, updateById, removeById, updateCollection,
         event.preventDefault();
         const idTrilha = Number(linkForm.idTrilha);
         const idCurso = Number(linkForm.idCurso);
-        if (data.trilhasCursos.some((item) => item.idTrilha === idTrilha && item.idCurso === idCurso)) {
+        if (data.trilhasCursos.some((item) => sameId(item.idTrilha, idTrilha) && sameId(item.idCurso, idCurso))) {
             notify("Esse curso já está vinculado a essa trilha.", "danger");
             return;
         }
@@ -608,7 +614,7 @@ function TracksPage({ data, addWithId, updateById, removeById, updateCollection,
                     item.trilhaNome,
                     item.cursoNome,
                     item.ordem,
-                    <ActionButton danger onClick={() => updateCollection("trilhasCursos", (list) => list.filter((record) => !(record.idTrilha === item.idTrilha && record.idCurso === item.idCurso)))}>Excluir</ActionButton>
+                    <ActionButton danger onClick={() => updateCollection("trilhasCursos", (list) => list.filter((record) => !(sameId(record.idTrilha, item.idTrilha) && sameId(record.idCurso, item.idCurso))))}>Excluir</ActionButton>
                 ])}
             />
         </>
@@ -638,7 +644,7 @@ function EnrollmentsPage({ data, addWithId, updateById, removeById, notify }: Pa
             onSubmit={(form) => {
                 const idUsuario = Number(form.idUsuario);
                 const idCurso = Number(form.idCurso);
-                if (data.matriculas.some((item) => item.idUsuario === idUsuario && item.idCurso === idCurso)) {
+                if (data.matriculas.some((item) => sameId(item.idUsuario, idUsuario) && sameId(item.idCurso, idCurso))) {
                     notify("Esse usuário já está matriculado nesse curso.", "danger");
                     return false;
                 }
@@ -653,7 +659,7 @@ function EnrollmentsPage({ data, addWithId, updateById, removeById, notify }: Pa
             onUpdate={(item, form) => {
                 const idUsuario = Number(form.idUsuario);
                 const idCurso = Number(form.idCurso);
-                if (data.matriculas.some((enrollment) => enrollment.id !== item.id && enrollment.idUsuario === idUsuario && enrollment.idCurso === idCurso)) {
+                if (data.matriculas.some((enrollment) => !sameId(enrollment.id, item.id) && sameId(enrollment.idUsuario, idUsuario) && sameId(enrollment.idCurso, idCurso))) {
                     notify("Esse usuário já está matriculado nesse curso.", "danger");
                     return false;
                 }
@@ -668,33 +674,33 @@ function EnrollmentsPage({ data, addWithId, updateById, removeById, notify }: Pa
 function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) {
     const [selectedUserId, setSelectedUserId] = useState("");
     const idUsuario = Number(selectedUserId);
-    const selectedUser = data.usuarios.find((item) => item.id === idUsuario);
+    const selectedUser = data.usuarios.find((item) => sameId(item.id, idUsuario));
 
-    function isLessonDone(idAula: number) {
+    function isLessonDone(idAula: RecordId) {
         return data.progressoAulas.some((item) => {
-            return item.idUsuario === idUsuario && item.idAula === idAula && normalize(item.status).includes("concl");
+            return sameId(item.idUsuario, idUsuario) && sameId(item.idAula, idAula) && normalize(item.status).includes("concl");
         });
     }
 
-    async function toggleLesson(idAula: number, checked: boolean) {
+    async function toggleLesson(idAula: RecordId, checked: boolean) {
         if (!idUsuario) {
             notify("Selecione um aluno antes de marcar aulas.", "danger");
             return;
         }
 
         updateCollection("progressoAulas", (list) => {
-            const withoutCurrent = list.filter((item) => !(item.idUsuario === idUsuario && item.idAula === idAula));
+            const withoutCurrent = list.filter((item) => !(sameId(item.idUsuario, idUsuario) && sameId(item.idAula, idAula)));
             if (!checked) {
                 return withoutCurrent;
             }
 
-            return [...withoutCurrent, { id: nextId(list), idUsuario, idAula, status: "Concluído", dataConclusao: todayISO() }];
+            return [...withoutCurrent, { id: nextId(list), idUsuario, idAula: Number(idAula), status: "Concluído", dataConclusao: todayISO() }];
         });
     }
 
     function courseProgress(course: Curso) {
-        const modules = data.modulos.filter((module) => module.idCurso === course.id);
-        const lessons = data.aulas.filter((lesson) => modules.some((module) => module.id === lesson.idModulo));
+        const modules = data.modulos.filter((module) => sameId(module.idCurso, course.id));
+        const lessons = data.aulas.filter((lesson) => modules.some((module) => sameId(module.id, lesson.idModulo)));
         const done = lessons.filter((lesson) => isLessonDone(lesson.id)).length;
         return { done, total: lessons.length };
     }
@@ -727,7 +733,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
                 {data.cursos.length === 0 ? (
                     <div className="panel text-center text-muted">Nenhum curso cadastrado.</div>
                 ) : data.cursos.map((course) => {
-                    const modules = data.modulos.filter((module) => module.idCurso === course.id).sort((a, b) => a.ordem - b.ordem);
+                    const modules = data.modulos.filter((module) => sameId(module.idCurso, course.id)).sort((a, b) => a.ordem - b.ordem);
                     const summary = courseProgress(course);
                     return (
                         <article className="panel course-progress" key={course.id}>
@@ -741,7 +747,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
                             {modules.length === 0 ? (
                                 <p className="text-muted mb-0">Nenhum módulo cadastrado neste curso.</p>
                             ) : modules.map((module) => {
-                                const lessons = data.aulas.filter((lesson) => lesson.idModulo === module.id).sort((a, b) => a.ordem - b.ordem);
+                                const lessons = data.aulas.filter((lesson) => sameId(lesson.idModulo, module.id)).sort((a, b) => a.ordem - b.ordem);
                                 return (
                                     <div className="module-progress" key={module.id}>
                                         <h3 className="h6 mb-2">{module.ordem}. {module.titulo}</h3>
@@ -830,9 +836,9 @@ function CertificatesPage({ data, addWithId, updateById, updateCollection, notif
     const rows = data.certificados.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     function hasCompletedProgress(idUsuario: number, idCurso: number) {
-        const courseModules = data.modulos.filter((module) => module.idCurso === idCurso);
-        const lessonIds = data.aulas.filter((lesson) => courseModules.some((module) => module.id === lesson.idModulo)).map((lesson) => lesson.id);
-        return data.progressoAulas.some((progress) => progress.idUsuario === idUsuario && lessonIds.includes(progress.idAula) && normalize(progress.status).includes("concl"));
+        const courseModules = data.modulos.filter((module) => sameId(module.idCurso, idCurso));
+        const lessonIds = data.aulas.filter((lesson) => courseModules.some((module) => sameId(module.id, lesson.idModulo))).map((lesson) => lesson.id);
+        return data.progressoAulas.some((progress) => sameId(progress.idUsuario, idUsuario) && lessonIds.some((idAula) => sameId(idAula, progress.idAula)) && normalize(progress.status).includes("concl"));
     }
 
     return (
@@ -856,7 +862,7 @@ function CertificatesPage({ data, addWithId, updateById, updateCollection, notif
             onSubmit={(form) => {
                 const idUsuario = Number(form.idUsuario);
                 const idCurso = Number(form.idCurso);
-                if (data.certificados.some((item) => item.idUsuario === idUsuario && item.idCurso === idCurso)) {
+                if (data.certificados.some((item) => sameId(item.idUsuario, idUsuario) && sameId(item.idCurso, idCurso))) {
                     notify("Já existe certificado para esse usuário nesse curso.", "danger");
                     return false;
                 }
@@ -879,14 +885,14 @@ function CertificatesPage({ data, addWithId, updateById, updateCollection, notif
             onUpdate={(item, form) => {
                 const idUsuario = Number(form.idUsuario);
                 const idCurso = Number(form.idCurso);
-                if (data.certificados.some((certificate) => certificate.id !== item.id && certificate.idUsuario === idUsuario && certificate.idCurso === idCurso)) {
+                if (data.certificados.some((certificate) => !sameId(certificate.id, item.id) && sameId(certificate.idUsuario, idUsuario) && sameId(certificate.idCurso, idCurso))) {
                     notify("Já existe certificado para esse usuário nesse curso.", "danger");
                     return false;
                 }
                 updateById("certificados", item.id, { idUsuario, idCurso, dataEmissao: form.dataEmissao });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => updateCollection("certificados", (list) => list.filter((record) => record.id !== item.id))}>Excluir</ActionButton>}
+            renderActions={(item) => <ActionButton danger onClick={() => updateCollection("certificados", (list) => list.filter((record) => !sameId(record.id, item.id)))}>Excluir</ActionButton>}
         />
     );
 }
@@ -978,7 +984,7 @@ function PaymentsPage({ data, addWithId, updateById, removeById, notify }: PageP
                 idTransacaoGateway: item.idTransacaoGateway
             })}
             onUpdate={(item, form) => {
-                if (data.pagamentos.some((payment) => payment.id !== item.id && normalize(payment.idTransacaoGateway) === normalize(form.idTransacaoGateway))) {
+                if (data.pagamentos.some((payment) => !sameId(payment.id, item.id) && normalize(payment.idTransacaoGateway) === normalize(form.idTransacaoGateway))) {
                     notify("Já existe pagamento com esse ID de transação.", "danger");
                     return false;
                 }
@@ -997,8 +1003,8 @@ function PaymentsPage({ data, addWithId, updateById, removeById, notify }: PageP
 }
 
 function courseSummary(data: AppData, course: Curso) {
-    const modules = data.modulos.filter((module) => module.idCurso === course.id);
-    const lessons = data.aulas.filter((lesson) => modules.some((module) => module.id === lesson.idModulo));
+    const modules = data.modulos.filter((module) => sameId(module.idCurso, course.id));
+    const lessons = data.aulas.filter((lesson) => modules.some((module) => sameId(module.id, lesson.idModulo)));
     const minutes = lessons.reduce((total, lesson) => total + lesson.duracaoMinutos, 0);
     return {
         ...course,
@@ -1009,8 +1015,8 @@ function courseSummary(data: AppData, course: Curso) {
     };
 }
 
-function subscriptionDescription(data: AppData, idAssinatura: number) {
-    const subscription = data.assinaturas.find((item) => item.id === Number(idAssinatura));
+function subscriptionDescription(data: AppData, idAssinatura: RecordId) {
+    const subscription = data.assinaturas.find((item) => sameId(item.id, idAssinatura));
     if (!subscription) {
         return "-";
     }
@@ -1032,7 +1038,7 @@ function promptNumber(label: string, fallback = "1") {
     return Number.isFinite(value) && value > 0 ? value : null;
 }
 
-function promptChoice<T extends { id: number }>(title: string, list: T[], label: (item: T) => string) {
+function promptChoice<T extends { id: RecordId }>(title: string, list: T[], label: (item: T) => string) {
     if (list.length === 0) {
         return null;
     }
@@ -1136,7 +1142,7 @@ function quickCreateModule(props: QuickCreateProps) {
         notify("Dados do módulo inválidos.", "danger");
         return;
     }
-    if (data.modulos.some((item) => item.idCurso === idCurso && item.ordem === ordem)) {
+    if (data.modulos.some((item) => sameId(item.idCurso, idCurso) && item.ordem === ordem)) {
         notify("Já existe um módulo com essa ordem neste curso.", "danger");
         return;
     }
@@ -1158,7 +1164,7 @@ function quickCreateLesson(props: QuickCreateProps) {
         notify("Dados da aula inválidos.", "danger");
         return;
     }
-    if (data.aulas.some((item) => item.idModulo === idModulo && item.ordem === ordem)) {
+    if (data.aulas.some((item) => sameId(item.idModulo, idModulo) && item.ordem === ordem)) {
         notify("Já existe uma aula com essa ordem neste módulo.", "danger");
         return;
     }
