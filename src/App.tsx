@@ -45,8 +45,8 @@ export function App() {
     }
 
     // Sincroniza alteracoes de listas completas, como progresso e vinculos.
-    async function updateCollection<K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) {
-        const previousList = data[name];
+    async function updateCollection(name: CollectionName, updater: (list: any[]) => any[]) {
+        const previousList = data[name] as any[];
         const updated = updater(previousList);
         setData((current) => ({ ...current, [name]: updated }));
 
@@ -62,7 +62,7 @@ export function App() {
     }
 
     // Cria um registro novo na API e atualiza a tela.
-    async function addWithId<K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) {
+    async function addWithId(name: CollectionName, record: any) {
         try {
             const saved = await createRecord(name, record);
             setData((current) => ({ ...current, [name]: [...current[name], saved] }));
@@ -73,13 +73,13 @@ export function App() {
     }
 
     // Remove primeiro da tela e restaura se a API falhar.
-    async function removeById<K extends CollectionName>(name: K, id: RecordId) {
+    async function removeById(name: CollectionName, id: RecordId) {
         if (!window.confirm("Deseja excluir este registro?")) {
             return;
         }
 
-        const previousList = data[name];
-        const updated = (previousList as unknown as WithId[]).filter((item) => Number(item.id) !== Number(id)) as unknown as AppData[K];
+        const previousList = data[name] as any[];
+        const updated = (previousList as WithId[]).filter((item) => Number(item.id) !== Number(id));
         setData((current) => ({ ...current, [name]: updated }));
 
         try {
@@ -92,14 +92,14 @@ export function App() {
     }
 
     // Atualiza um registro existente pelo id.
-    async function updateById<K extends CollectionName>(name: K, id: RecordId, patch: Partial<AppData[K][number]>) {
+    async function updateById(name: CollectionName, id: RecordId, patch: any) {
         try {
             const saved = await updateRecord(name, id, patch);
             setData((current) => ({
                 ...current,
                 [name]: (current[name] as unknown as WithId[]).map((item) => {
                     return Number(item.id) === Number(id) ? saved : item;
-                }) as unknown as AppData[K]
+                })
             }));
             notify("Registro atualizado com sucesso.");
         } catch {

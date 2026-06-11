@@ -3,10 +3,10 @@ import type { AppData, CollectionName, RecordId } from "../models/types";
 // Contrato compartilhado por todas as paginas.
 export interface PageProps {
     data: AppData;
-    addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => Promise<void>;
-    updateById: <K extends CollectionName>(name: K, id: RecordId, patch: Partial<AppData[K][number]>) => Promise<void>;
-    removeById: <K extends CollectionName>(name: K, id: RecordId) => Promise<void>;
-    updateCollection: <K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) => Promise<AppData[K] | undefined>;
+    addWithId: (name: CollectionName, record: any) => Promise<void>;
+    updateById: (name: CollectionName, id: RecordId, patch: any) => Promise<void>;
+    removeById: (name: CollectionName, id: RecordId) => Promise<void>;
+    updateCollection: (name: CollectionName, updater: (list: any[]) => any[]) => Promise<any[] | undefined>;
     notify: (message: string, type?: "success" | "warning" | "danger") => void;
     navigate: (section: string) => void;
 }

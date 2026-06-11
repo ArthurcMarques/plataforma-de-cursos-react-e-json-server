@@ -6,8 +6,8 @@ export interface SelectOption {
     label: string;
 }
 
-export interface FieldConfig<TForm extends Record<string, string>> {
-    name: keyof TForm & string;
+export interface FieldConfig {
+    name: string;
     label: string;
     type?: "text" | "email" | "password" | "date" | "number" | "select" | "textarea" | "url";
     required?: boolean;
@@ -19,29 +19,31 @@ export interface FieldConfig<TForm extends Record<string, string>> {
     onAction?: () => void;
 }
 
-export interface ColumnConfig<TRow> {
+export interface ColumnConfig {
     key: string;
     label: string;
-    render?: (row: TRow) => ReactNode;
+    render?: (row: any) => ReactNode;
 }
 
-interface CrudPageProps<TForm extends Record<string, string>, TRow extends object> {
+type FormValues = Record<string, string>;
+
+interface CrudPageProps {
     title: string;
     description: string;
-    initialValues: TForm;
-    fields: FieldConfig<TForm>[];
-    columns: ColumnConfig<TRow>[];
-    rows: TRow[];
+    initialValues: FormValues;
+    fields: FieldConfig[];
+    columns: ColumnConfig[];
+    rows: any[];
     emptyText: string;
-    onSubmit: (form: TForm) => boolean | void | Promise<boolean | void>;
-    getEditValues?: (row: TRow) => TForm;
-    onUpdate?: (row: TRow, form: TForm) => boolean | void | Promise<boolean | void>;
-    renderActions?: (row: TRow) => ReactNode;
-    getRowKey?: (row: TRow) => string | number;
+    onSubmit: (form: FormValues) => boolean | void | Promise<boolean | void>;
+    getEditValues?: (row: any) => FormValues;
+    onUpdate?: (row: any, form: FormValues) => boolean | void | Promise<boolean | void>;
+    renderActions?: (row: any) => ReactNode;
+    getRowKey?: (row: any) => string | number;
 }
 
 // Componente generico para telas de cadastro, edicao e listagem.
-export function CrudPage<TForm extends Record<string, string>, TRow extends object>({
+export function CrudPage({
     title,
     description,
     initialValues,
@@ -54,11 +56,11 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
     onUpdate,
     renderActions,
     getRowKey
-}: CrudPageProps<TForm, TRow>) {
-    const [form, setForm] = useState<TForm>(initialValues);
-    const [editingRow, setEditingRow] = useState<TRow | null>(null);
+}: CrudPageProps) {
+    const [form, setForm] = useState<FormValues>(initialValues);
+    const [editingRow, setEditingRow] = useState<any | null>(null);
 
-    function change(name: keyof TForm & string, value: string) {
+    function change(name: string, value: string) {
         setForm((current) => ({ ...current, [name]: value }));
     }
 
@@ -70,7 +72,7 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
         }
     }
 
-    function startEdit(row: TRow) {
+    function startEdit(row: any) {
         if (!getEditValues) {
             return;
         }
@@ -85,7 +87,7 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
         setForm(initialValues);
     }
 
-    function renderRowActions(row: TRow) {
+    function renderRowActions(row: any) {
         const customActions = renderActions ? renderActions(row) : null;
         if (!getEditValues || !onUpdate) {
             return customActions;
@@ -122,10 +124,10 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
     );
 }
 
-function FormField<TForm extends Record<string, string>>({ field, value, onChange }: {
-    field: FieldConfig<TForm>;
+function FormField({ field, value, onChange }: {
+    field: FieldConfig;
     value: string;
-    onChange: (name: keyof TForm & string, value: string) => void;
+    onChange: (name: string, value: string) => void;
 }) {
     const commonProps = {
         id: field.name,
@@ -162,12 +164,12 @@ function FormField<TForm extends Record<string, string>>({ field, value, onChang
     );
 }
 
-function DataTable<TRow extends object>({ columns, rows, emptyText, renderActions, getRowKey }: {
-    columns: ColumnConfig<TRow>[];
-    rows: TRow[];
+function DataTable({ columns, rows, emptyText, renderActions, getRowKey }: {
+    columns: ColumnConfig[];
+    rows: any[];
     emptyText: string;
-    renderActions?: (row: TRow) => ReactNode;
-    getRowKey?: (row: TRow) => string | number;
+    renderActions?: (row: any) => ReactNode;
+    getRowKey?: (row: any) => string | number;
 }) {
     return (
         <section className="panel">

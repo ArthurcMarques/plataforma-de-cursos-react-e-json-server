@@ -1,6 +1,7 @@
 import type { AppData, CollectionName, RecordId } from "../models/types";
 
 type WithId = { id: RecordId };
+type AnyRecord = Record<string, any>;
 
 // URL base do JSON Server. Pode ser trocada por VITE_API_URL.
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
@@ -39,22 +40,19 @@ export async function fetchAppData(): Promise<AppData> {
     return Object.fromEntries(entries) as unknown as AppData;
 }
 
-export async function createRecord<K extends CollectionName>(
-    name: K,
-    record: Omit<AppData[K][number], "id"> | AppData[K][number]
-): Promise<AppData[K][number]> {
-    return request<AppData[K][number]>(`/${name}`, {
+export async function createRecord(name: CollectionName, record: AnyRecord): Promise<AnyRecord> {
+    return request<AnyRecord>(`/${name}`, {
         method: "POST",
         body: JSON.stringify(record)
     });
 }
 
-export async function updateRecord<K extends CollectionName>(
-    name: K,
+export async function updateRecord(
+    name: CollectionName,
     id: RecordId,
-    patch: Partial<AppData[K][number]>
-): Promise<AppData[K][number]> {
-    return request<AppData[K][number]>(`/${name}/${id}`, {
+    patch: AnyRecord
+): Promise<AnyRecord> {
+    return request<AnyRecord>(`/${name}/${id}`, {
         method: "PATCH",
         body: JSON.stringify(patch)
     });
@@ -65,11 +63,11 @@ export async function deleteRecord(name: CollectionName, id: RecordId): Promise<
 }
 
 // Compara a lista atual com a nova e aplica POST, PATCH ou DELETE.
-export async function syncCollection<K extends CollectionName>(
-    name: K,
-    currentList: AppData[K],
-    nextList: AppData[K]
-): Promise<AppData[K]> {
+export async function syncCollection(
+    name: CollectionName,
+    currentList: any[],
+    nextList: any[]
+): Promise<any[]> {
     const current = currentList as unknown as WithId[];
     const next = nextList as unknown as WithId[];
     const nextIds = new Set(next.map((item) => Number(item.id)));
@@ -84,14 +82,14 @@ export async function syncCollection<K extends CollectionName>(
     const saved = await Promise.all(
         next.map((item) => {
             if (currentIds.has(Number(item.id))) {
-                return updateRecord(name, item.id, item as Partial<AppData[K][number]>);
+                return updateRecord(name, item.id, item);
             }
 
-            return createRecord(name, item as AppData[K][number]);
+            return createRecord(name, item);
         })
     );
 
-    return saved as AppData[K];
+    return saved;
 }
 
 // Wrapper simples para padronizar chamadas HTTP.
