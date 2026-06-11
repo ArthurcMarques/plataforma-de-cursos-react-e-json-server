@@ -1,0 +1,194 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "nomeCompleto": "Ana Souza",
+      "email": "ana.souza@email.com",
+      "senha": "123456",
+      "dataCadastro": "2026-06-01",
+      "tipoUsuario": "Aluno"
+    },
+    {
+      "id": 2,
+      "nomeCompleto": "Carlos Mendes",
+      "email": "carlos.mendes@email.com",
+      "senha": "123456",
+      "dataCadastro": "2026-06-01",
+      "tipoUsuario": "Instrutor"
+    }
+  ],
+  "categorias": [
+    {
+      "id": 1,
+      "nome": "Programação",
+      "descricao": "Cursos de desenvolvimento de software."
+    },
+    {
+      "id": 2,
+      "nome": "Design",
+      "descricao": "Cursos de criação visual e experiência do usuário."
+    }
+  ],
+  "cursos": [
+    {
+      "id": 1,
+      "titulo": "React para Iniciantes",
+      "descricao": "Fundamentos de componentes, estado e eventos com React.",
+      "nivel": "Iniciante",
+      "idCategoria": 1,
+      "idInstrutor": 2,
+      "dataPublicacao": "2026-06-01",
+      "totalAulas": 0,
+      "totalHoras": 0
+    },
+    {
+      "id": 2,
+      "titulo": "UX Essencial",
+      "descricao": "Princípios de usabilidade, pesquisa e prototipação.",
+      "nivel": "Iniciante",
+      "idCategoria": 2,
+      "idInstrutor": 2,
+      "dataPublicacao": "2026-06-02",
+      "totalAulas": 0,
+      "totalHoras": 0
+    }
+  ],
+  "modulos": [
+    {
+      "id": 1,
+      "idCurso": 1,
+      "titulo": "Primeiros passos",
+      "ordem": 1
+    },
+    {
+      "id": 2,
+      "idCurso": 1,
+      "titulo": "Componentes e estado",
+      "ordem": 2
+    },
+    {
+      "id": 3,
+      "idCurso": 2,
+      "titulo": "Fundamentos de UX",
+      "ordem": 1
+    }
+  ],
+  "aulas": [
+    {
+      "id": 1,
+      "idModulo": 1,
+      "titulo": "O que é React",
+      "tipoConteudo": "Vídeo",
+      "urlConteudo": "",
+      "duracaoMinutos": 18,
+      "ordem": 1
+    },
+    {
+      "id": 2,
+      "idModulo": 1,
+      "titulo": "Criando o primeiro componente",
+      "tipoConteudo": "Vídeo",
+      "urlConteudo": "",
+      "duracaoMinutos": 25,
+      "ordem": 2
+    },
+    {
+      "id": 3,
+      "idModulo": 2,
+      "titulo": "Estado com useState",
+      "tipoConteudo": "Texto",
+      "urlConteudo": "",
+      "duracaoMinutos": 30,
+      "ordem": 1
+    },
+    {
+      "id": 4,
+      "idModulo": 3,
+      "titulo": "Heurísticas de usabilidade",
+      "tipoConteudo": "Texto",
+      "urlConteudo": "",
+      "duracaoMinutos": 22,
+      "ordem": 1
+    }
+  ],
+  "matriculas": [
+    {
+      "id": 1,
+      "idUsuario": 1,
+      "idCurso": 1,
+      "dataMatricula": "2026-06-03",
+      "dataConclusao": null
+    }
+  ],
+  "progressoAulas": [
+    {
+      "id": 1,
+      "idUsuario": 1,
+      "idAula": 1,
+      "status": "Concluído",
+      "dataConclusao": "2026-06-04"
+    }
+  ],
+  "avaliacoes": [
+    {
+      "id": 1,
+      "idUsuario": 1,
+      "idCurso": 1,
+      "nota": 5,
+      "comentario": "Conteúdo bem organizado.",
+      "dataAvaliacao": "2026-06-04"
+    }
+  ],
+  "trilhas": [
+    {
+      "id": 1,
+      "titulo": "Front-end Básico",
+      "descricao": "Sequência inicial para desenvolvimento front-end.",
+      "idCategoria": 1
+    }
+  ],
+  "trilhasCursos": [
+    {
+      "id": 1,
+      "idTrilha": 1,
+      "idCurso": 1,
+      "ordem": 1
+    }
+  ],
+  "certificados": [],
+  "planos": [
+    {
+      "id": 1,
+      "nome": "Mensal",
+      "descricao": "Acesso por 30 dias.",
+      "preco": 49.9,
+      "duracaoMeses": 1
+    },
+    {
+      "id": 2,
+      "nome": "Anual",
+      "descricao": "Acesso por 12 meses.",
+      "preco": 399.9,
+      "duracaoMeses": 12
+    }
+  ],
+  "assinaturas": [
+    {
+      "id": 1,
+      "idUsuario": 1,
+      "idPlano": 1,
+      "dataInicio": "2026-06-03",
+      "dataFim": "2026-07-03"
+    }
+  ],
+  "pagamentos": [
+    {
+      "id": 1,
+      "idAssinatura": 1,
+      "valorPago": 49.9,
+      "dataPagamento": "2026-06-03",
+      "metodoPagamento": "Pix",
+      "idTransacaoGateway": "TX-MOCK-001"
+    }
+  ]
+}

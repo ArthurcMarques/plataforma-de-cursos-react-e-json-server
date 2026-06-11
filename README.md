@@ -13,7 +13,7 @@ Documentação base do professor:
 - React 18
 - TypeScript
 - Vite
-- `localStorage` para persistência simples no navegador
+- JSON Server para API REST local
 
 ## Estrutura principal
 
@@ -23,8 +23,8 @@ plataforma-cursos/
   package.json
   src/
     App.tsx
+    api.ts
     main.tsx
-    storage.ts
     types.ts
     utils.ts
     components/
@@ -73,7 +73,19 @@ Instale as dependências:
 npm install
 ```
 
-Rode o servidor de desenvolvimento:
+Rode a API local em um terminal:
+
+```bash
+npm run server
+```
+
+Ela ficará disponível em:
+
+```text
+http://localhost:3001
+```
+
+Em outro terminal, rode o servidor de desenvolvimento:
 
 ```bash
 npm run dev
@@ -93,18 +105,16 @@ npm run build
 
 ## Persistência de dados
 
-Os dados ficam salvos no `localStorage` do navegador.
+Os dados ficam salvos no arquivo `db.json` e são acessados pela aplicação por meio do JSON Server.
 
-Quando o navegador ainda não tem dados da aplicação, a plataforma carrega uma base inicial mockada com usuários, categorias, cursos, módulos, aulas, matrícula, plano, assinatura e pagamento.
+O frontend usa `http://localhost:3001` como URL padrão da API. Para mudar esse endereço, defina a variável de ambiente `VITE_API_URL`.
 
-Para limpar:
+Para restaurar a base inicial, substitua o conteúdo de `db.json` pela versão original do repositório.
 
-```js
-localStorage.clear()
-```
+As principais coleções expostas pela API são: `usuarios`, `categorias`, `cursos`, `modulos`, `aulas`, `matriculas`, `progressoAulas`, `avaliacoes`, `trilhas`, `trilhasCursos`, `certificados`, `planos`, `assinaturas` e `pagamentos`.
 
 ## Observações
 
-- Não usa backend.
+- Usa JSON Server como backend local.
 - Usa React com TypeScript e Vite.
 - Projeto focado em implementação simples e didática.

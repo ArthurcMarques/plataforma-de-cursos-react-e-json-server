@@ -67,6 +67,7 @@ export interface Matricula {
 }
 
 export interface ProgressoAula {
+    id: number;
     idUsuario: number;
     idAula: number;
     status: "Concluído" | "Em andamento";
@@ -90,6 +91,7 @@ export interface Trilha {
 }
 
 export interface TrilhaCurso {
+    id: number;
     idTrilha: number;
     idCurso: number;
     ordem: number;

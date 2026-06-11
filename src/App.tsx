@@ -1,8 +1,8 @@
 import type { FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createRecord, deleteRecord, emptyAppData, fetchAppData, syncCollection, updateRecord } from "./api";
 import { CrudPage } from "./components/CrudPage";
 import { Layout, type SectionItem } from "./components/Layout";
-import { loadInitialData, saveCollection } from "./storage";
 import type {
     AppData,
     Assinatura,
@@ -44,48 +44,84 @@ type WithId = { id: number };
 
 export function App() {
     const [currentSection, setCurrentSection] = useState("dashboard");
-    const [data, setData] = useState<AppData>(loadInitialData);
+    const [data, setData] = useState<AppData>(emptyAppData);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [alert, setAlert] = useState<AlertState>(null);
+
+    useEffect(() => {
+        void refreshData();
+    }, []);
+
+    async function refreshData() {
+        setLoading(true);
+        try {
+            setData(await fetchAppData());
+            setError(null);
+        } catch {
+            setError("Não foi possível carregar os dados. Verifique se o JSON Server está rodando.");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     function notify(message: string, type: "success" | "warning" | "danger" = "success") {
         setAlert({ message, type });
         window.setTimeout(() => setAlert(null), 2800);
     }
 
-    function updateCollection<K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) {
-        setData((current) => {
-            const updated = updater(current[name]);
-            saveCollection(name, updated);
-            return { ...current, [name]: updated };
-        });
+    async function updateCollection<K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) {
+        try {
+            const updated = updater(data[name]);
+            const saved = await syncCollection(name, data[name], updated);
+            setData((current) => ({ ...current, [name]: saved }));
+            return saved;
+        } catch {
+            notify("Não foi possível salvar as alterações no servidor.", "danger");
+            return undefined;
+        }
     }
 
-    function addWithId<K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) {
-        updateCollection(name, (list) => {
-            const current = list as unknown as WithId[];
-            return [...current, { id: nextId(current), ...record }] as unknown as AppData[K];
-        });
-        notify("Registro salvo com sucesso.");
+    async function addWithId<K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) {
+        try {
+            const saved = await createRecord(name, record);
+            setData((current) => ({ ...current, [name]: [...current[name], saved] }));
+            notify("Registro salvo com sucesso.");
+        } catch {
+            notify("Não foi possível salvar o registro no servidor.", "danger");
+        }
     }
 
-    function removeById<K extends CollectionName>(name: K, id: number) {
+    async function removeById<K extends CollectionName>(name: K, id: number) {
         if (!window.confirm("Deseja excluir este registro?")) {
             return;
         }
 
-        updateCollection(name, (list) => {
-            return (list as unknown as WithId[]).filter((item) => Number(item.id) !== Number(id)) as unknown as AppData[K];
-        });
-        notify("Registro removido com sucesso.", "warning");
+        try {
+            await deleteRecord(name, id);
+            setData((current) => ({
+                ...current,
+                [name]: (current[name] as unknown as WithId[]).filter((item) => Number(item.id) !== Number(id)) as unknown as AppData[K]
+            }));
+            notify("Registro removido com sucesso.", "warning");
+        } catch {
+            notify("Não foi possível remover o registro no servidor.", "danger");
+        }
     }
 
-    function updateById<K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) {
-        updateCollection(name, (list) => {
-            return (list as unknown as WithId[]).map((item) => {
-                return Number(item.id) === Number(id) ? { ...item, ...patch } : item;
-            }) as unknown as AppData[K];
-        });
-        notify("Registro atualizado com sucesso.");
+    async function updateById<K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) {
+        try {
+            const saved = await updateRecord(name, id, patch);
+            setData((current) => ({
+                ...current,
+                [name]: (current[name] as unknown as WithId[]).map((item) => {
+                    return Number(item.id) === Number(id) ? saved : item;
+                }) as unknown as AppData[K]
+            }));
+            notify("Registro atualizado com sucesso.");
+        } catch {
+            notify("Não foi possível atualizar o registro no servidor.", "danger");
+        }
     }
 
     const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: setCurrentSection };
@@ -94,7 +130,16 @@ export function App() {
         <>
             <Layout sections={sections} currentSection={currentSection} onNavigate={setCurrentSection}>
                 {alert && <div className={`alert alert-${alert.type} floating-alert shadow-sm`} role="alert">{alert.message}</div>}
-                <CurrentSection section={currentSection} {...props} />
+                {loading ? (
+                    <section className="panel text-center text-muted">Carregando dados...</section>
+                ) : error ? (
+                    <section className="panel text-center">
+                        <p className="text-danger mb-3">{error}</p>
+                        <button className="btn btn-primary" type="button" onClick={() => void refreshData()}>Tentar novamente</button>
+                    </section>
+                ) : (
+                    <CurrentSection section={currentSection} {...props} />
+                )}
             </Layout>
         </>
     );
@@ -102,10 +147,10 @@ export function App() {
 
 interface PageProps {
     data: AppData;
-    addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => void;
-    updateById: <K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) => void;
-    removeById: <K extends CollectionName>(name: K, id: number) => void;
-    updateCollection: <K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) => void;
+    addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => Promise<void>;
+    updateById: <K extends CollectionName>(name: K, id: number, patch: Partial<AppData[K][number]>) => Promise<void>;
+    removeById: <K extends CollectionName>(name: K, id: number) => Promise<void>;
+    updateCollection: <K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) => Promise<AppData[K] | undefined>;
     notify: (message: string, type?: "success" | "warning" | "danger") => void;
     navigate: (section: string) => void;
 }
@@ -501,7 +546,7 @@ function TracksPage({ data, addWithId, updateById, removeById, updateCollection,
         cursoNome: nameById(data.cursos, item.idCurso, "titulo")
     }));
 
-    function submitLink(event: FormEvent<HTMLFormElement>) {
+    async function submitLink(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         const idTrilha = Number(linkForm.idTrilha);
         const idCurso = Number(linkForm.idCurso);
@@ -509,7 +554,7 @@ function TracksPage({ data, addWithId, updateById, removeById, updateCollection,
             notify("Esse curso já está vinculado a essa trilha.", "danger");
             return;
         }
-        updateCollection("trilhasCursos", (list) => [...list, { idTrilha, idCurso, ordem: Number(linkForm.ordem) }]);
+        await updateCollection("trilhasCursos", (list) => [...list, { id: nextId(list), idTrilha, idCurso, ordem: Number(linkForm.ordem) }]);
         setLinkForm({ idTrilha: "", idCurso: "", ordem: "" });
         notify("Curso vinculado à trilha.");
     }
@@ -631,7 +676,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
         });
     }
 
-    function toggleLesson(idAula: number, checked: boolean) {
+    async function toggleLesson(idAula: number, checked: boolean) {
         if (!idUsuario) {
             notify("Selecione um aluno antes de marcar aulas.", "danger");
             return;
@@ -643,7 +688,7 @@ function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) 
                 return withoutCurrent;
             }
 
-            return [...withoutCurrent, { idUsuario, idAula, status: "Concluído", dataConclusao: todayISO() }];
+            return [...withoutCurrent, { id: nextId(list), idUsuario, idAula, status: "Concluído", dataConclusao: todayISO() }];
         });
     }
 

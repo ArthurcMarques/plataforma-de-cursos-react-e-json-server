@@ -33,9 +33,9 @@ interface CrudPageProps<TForm extends Record<string, string>, TRow extends objec
     columns: ColumnConfig<TRow>[];
     rows: TRow[];
     emptyText: string;
-    onSubmit: (form: TForm) => boolean | void;
+    onSubmit: (form: TForm) => boolean | void | Promise<boolean | void>;
     getEditValues?: (row: TRow) => TForm;
-    onUpdate?: (row: TRow, form: TForm) => boolean | void;
+    onUpdate?: (row: TRow, form: TForm) => boolean | void | Promise<boolean | void>;
     renderActions?: (row: TRow) => ReactNode;
     getRowKey?: (row: TRow) => string | number;
 }
@@ -61,9 +61,9 @@ export function CrudPage<TForm extends Record<string, string>, TRow extends obje
         setForm((current) => ({ ...current, [name]: value }));
     }
 
-    function submit(event: FormEvent<HTMLFormElement>) {
+    async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const saved = editingRow && onUpdate ? onUpdate(editingRow, form) : onSubmit(form);
+        const saved = editingRow && onUpdate ? await onUpdate(editingRow, form) : await onSubmit(form);
         if (saved !== false) {
             resetForm();
         }
