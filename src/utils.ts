@@ -1,9 +1,11 @@
+import type { RecordId } from "./models/types";
+
+// Retorna a data atual no formato usado pelos inputs date.
 export function todayISO() {
     return new Date().toISOString().split("T")[0];
 }
 
-import type { RecordId } from "./models/types";
-
+// Gera o proximo id baseado nos registros ja carregados.
 export function nextId(list: Array<{ id: RecordId }>) {
     if (list.length === 0) {
         return 1;
@@ -12,14 +14,17 @@ export function nextId(list: Array<{ id: RecordId }>) {
     return Math.max(...list.map((item) => Number(item.id) || 0)) + 1;
 }
 
+// Normaliza textos para validacoes simples.
 export function normalize(value: unknown) {
     return String(value ?? "").trim().toLowerCase();
 }
 
+// Compara ids mesmo quando o JSON Server devolve strings.
 export function sameId(left: unknown, right: unknown) {
     return Number(left) === Number(right);
 }
 
+// Procura um nome/campo pelo id relacionado.
 export function nameById<T extends { id: RecordId }>(list: T[], id: RecordId, field: keyof T) {
     const item = list.find((record) => sameId(record.id, id));
     const value = item ? item[field] : "-";

@@ -3,6 +3,7 @@ import type { AppData, Aula, Curso, RecordId, Usuario } from "../models/types";
 import type { PageProps } from "./pageTypes";
 import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
 
+// Monta os dados calculados exibidos na tabela de cursos.
 export function courseSummary(data: AppData, course: Curso) {
     const modules = data.modulos.filter((module) => sameId(module.idCurso, course.id));
     const lessons = data.aulas.filter((lesson) => modules.some((module) => sameId(module.id, lesson.idModulo)));
@@ -16,6 +17,7 @@ export function courseSummary(data: AppData, course: Curso) {
     };
 }
 
+// Texto amigavel para identificar uma assinatura nas telas financeiras.
 export function subscriptionDescription(data: AppData, idAssinatura: RecordId) {
     const subscription = data.assinaturas.find((item) => sameId(item.id, idAssinatura));
     if (!subscription) {
@@ -29,6 +31,7 @@ export function money(value: number) {
     return `R$ ${Number(value).toFixed(2)}`;
 }
 
+// Prompts simples usados nos botoes de criacao rapida.
 function promptRequired(label: string) {
     const value = window.prompt(label)?.trim() ?? "";
     return value;
@@ -52,6 +55,7 @@ function promptChoice<T extends { id: RecordId }>(title: string, list: T[], labe
 
 type QuickCreateProps = Pick<PageProps, "data" | "addWithId" | "notify">;
 
+// Funcoes auxiliares para criar registros relacionados sem sair da tela atual.
 export function quickCreateCategory({ data, addWithId, notify }: QuickCreateProps) {
     const nome = promptRequired("Nome da categoria");
     if (!nome) {
@@ -206,10 +210,12 @@ export function quickCreateSubscription(props: QuickCreateProps) {
     addWithId("assinaturas", { idUsuario, idPlano, dataInicio, dataFim });
 }
 
+// Botao pequeno usado nas acoes das tabelas.
 export function ActionButton({ children, danger = false, onClick }: { children: string; danger?: boolean; onClick: () => void }) {
     return <button className={`btn btn-sm btn-${danger ? "outline-danger" : "outline-secondary"}`} type="button" onClick={onClick}>{children}</button>;
 }
 
+// Select reutilizado em telas que nao usam o CrudPage completo.
 export function SelectInput({ label, value, options, required, actionLabel, onAction, onChange }: {
     label: string;
     value: string;
@@ -237,6 +243,7 @@ export function SelectInput({ label, value, options, required, actionLabel, onAc
     );
 }
 
+// Input simples reutilizado em formularios menores.
 export function TextInput({ label, value, required, type = "text", onChange }: {
     label: string;
     value: string;
@@ -252,6 +259,7 @@ export function TextInput({ label, value, required, type = "text", onChange }: {
     );
 }
 
+// Tabela simples para listas montadas manualmente.
 export function SimpleTable({ columns, rows, emptyText }: { columns: string[]; rows: Array<Array<ReactNode>>; emptyText: string }) {
     return (
         <section className="panel">

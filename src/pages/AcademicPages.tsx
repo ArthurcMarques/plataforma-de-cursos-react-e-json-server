@@ -6,6 +6,7 @@ import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, courseSummary, quickCreateCategory, quickCreateCourse, quickCreateLesson, quickCreateModule, quickCreateTrack, quickCreateUser, SelectInput, SimpleTable, TextInput } from "./shared";
 
+// Paginas do modulo academico: categorias, cursos, modulos, aulas e trilhas.
 export function CategoriesPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage

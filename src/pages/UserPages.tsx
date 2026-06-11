@@ -5,6 +5,7 @@ import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, quickCreateCourse, quickCreateUser, SelectInput } from "./shared";
 
+// Paginas do modulo de usuario: usuarios, matriculas, progresso, avaliacoes e certificados.
 export function UsersPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage

@@ -1,3 +1,4 @@
+// Nomes das colecoes mantidas no JSON Server.
 export type CollectionName =
     | "usuarios"
     | "categorias"
@@ -16,6 +17,7 @@ export type CollectionName =
 
 export type RecordId = number | string;
 
+// Entidades principais da plataforma.
 export interface Usuario {
     id: RecordId;
     nomeCompleto: string;

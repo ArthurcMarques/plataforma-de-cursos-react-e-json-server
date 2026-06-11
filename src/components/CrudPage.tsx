@@ -40,6 +40,7 @@ interface CrudPageProps<TForm extends Record<string, string>, TRow extends objec
     getRowKey?: (row: TRow) => string | number;
 }
 
+// Componente generico para telas de cadastro, edicao e listagem.
 export function CrudPage<TForm extends Record<string, string>, TRow extends object>({
     title,
     description,

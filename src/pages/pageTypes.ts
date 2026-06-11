@@ -1,5 +1,6 @@
 import type { AppData, CollectionName, RecordId } from "../models/types";
 
+// Contrato compartilhado por todas as paginas.
 export interface PageProps {
     data: AppData;
     addWithId: <K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) => Promise<void>;

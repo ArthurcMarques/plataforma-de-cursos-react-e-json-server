@@ -13,6 +13,7 @@ interface LayoutProps {
     children: ReactNode;
 }
 
+// Layout principal com menu de navegacao e area de conteudo.
 export function Layout({ sections, currentSection, onNavigate, children }: LayoutProps) {
     const grouped = sections.reduce<Record<string, SectionItem[]>>((groups, section) => {
         if (section.group === "principal") {

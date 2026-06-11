@@ -11,9 +11,12 @@ type AlertState = { message: string; type: "success" | "warning" | "danger" } | 
 type WithId = { id: RecordId };
 
 export function App() {
+    // Identifica a pagina atual pela URL.
     const location = useLocation();
     const navigate = useNavigate();
     const currentSection = sectionByPath[location.pathname] ?? "dashboard";
+
+    // Estado principal compartilhado entre todas as paginas.
     const [data, setData] = useState<AppData>(emptyAppData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -23,6 +26,7 @@ export function App() {
         void refreshData();
     }, []);
 
+    // Busca todas as colecoes no JSON Server.
     async function refreshData() {
         setLoading(true);
         try {
@@ -40,6 +44,7 @@ export function App() {
         window.setTimeout(() => setAlert(null), 2800);
     }
 
+    // Sincroniza alteracoes de listas completas, como progresso e vinculos.
     async function updateCollection<K extends CollectionName>(name: K, updater: (list: AppData[K]) => AppData[K]) {
         const previousList = data[name];
         const updated = updater(previousList);
@@ -56,6 +61,7 @@ export function App() {
         }
     }
 
+    // Cria um registro novo na API e atualiza a tela.
     async function addWithId<K extends CollectionName>(name: K, record: Omit<AppData[K][number], "id">) {
         try {
             const saved = await createRecord(name, record);
@@ -66,6 +72,7 @@ export function App() {
         }
     }
 
+    // Remove primeiro da tela e restaura se a API falhar.
     async function removeById<K extends CollectionName>(name: K, id: RecordId) {
         if (!window.confirm("Deseja excluir este registro?")) {
             return;
@@ -84,6 +91,7 @@ export function App() {
         }
     }
 
+    // Atualiza um registro existente pelo id.
     async function updateById<K extends CollectionName>(name: K, id: RecordId, patch: Partial<AppData[K][number]>) {
         try {
             const saved = await updateRecord(name, id, patch);
@@ -103,6 +111,7 @@ export function App() {
         navigate(sectionPaths[section] ?? "/");
     }
 
+    // Props reutilizadas pelas paginas de CRUD.
     const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: navigateToSection };
 
     return (

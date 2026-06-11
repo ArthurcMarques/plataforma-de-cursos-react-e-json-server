@@ -1,5 +1,6 @@
 import type { SectionItem } from "../components/Layout";
 
+// Configuracao das secoes exibidas no menu.
 export const sections: SectionItem[] = [
     { id: "dashboard", name: "Início", group: "principal" },
     { id: "categorias", name: "Categorias", group: "Acadêmico" },
@@ -17,6 +18,7 @@ export const sections: SectionItem[] = [
     { id: "pagamentos", name: "Pagamentos", group: "Financeiro" }
 ];
 
+// Caminhos usados pelo React Router.
 export const sectionPaths: Record<string, string> = {
     dashboard: "/",
     categorias: "/categorias",
@@ -34,4 +36,5 @@ export const sectionPaths: Record<string, string> = {
     pagamentos: "/pagamentos"
 };
 
+// Permite descobrir a secao atual a partir da URL.
 export const sectionByPath = Object.fromEntries(Object.entries(sectionPaths).map(([section, path]) => [path, section]));

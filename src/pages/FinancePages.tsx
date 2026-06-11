@@ -4,6 +4,7 @@ import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, money, quickCreatePlan, quickCreateSubscription, quickCreateUser, subscriptionDescription } from "./shared";
 
+// Paginas do modulo financeiro: planos, assinaturas e pagamentos.
 export function PlansPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
     return (
         <CrudPage

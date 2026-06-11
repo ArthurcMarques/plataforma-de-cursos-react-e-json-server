@@ -2,8 +2,10 @@ import type { AppData, CollectionName, RecordId } from "../models/types";
 
 type WithId = { id: RecordId };
 
+// URL base do JSON Server. Pode ser trocada por VITE_API_URL.
 const API_URL = (import.meta.env.VITE_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
 
+// Colecoes expostas no db.json.
 export const collections: CollectionName[] = [
     "usuarios",
     "categorias",
@@ -25,6 +27,7 @@ export function emptyAppData(): AppData {
     return collections.reduce((data, name) => ({ ...data, [name]: [] }), {} as AppData);
 }
 
+// Carrega todas as colecoes usadas pela aplicacao.
 export async function fetchAppData(): Promise<AppData> {
     const entries = await Promise.all(
         collections.map(async (name) => {
@@ -61,6 +64,7 @@ export async function deleteRecord(name: CollectionName, id: RecordId): Promise<
     await request<void>(`/${name}/${id}`, { method: "DELETE" });
 }
 
+// Compara a lista atual com a nova e aplica POST, PATCH ou DELETE.
 export async function syncCollection<K extends CollectionName>(
     name: K,
     currentList: AppData[K],
@@ -90,6 +94,7 @@ export async function syncCollection<K extends CollectionName>(
     return saved as AppData[K];
 }
 
+// Wrapper simples para padronizar chamadas HTTP.
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const response = await fetch(`${API_URL}${path}`, {
         headers: { "Content-Type": "application/json" },

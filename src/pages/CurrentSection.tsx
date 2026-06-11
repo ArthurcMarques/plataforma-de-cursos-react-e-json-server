@@ -5,6 +5,7 @@ import { PaymentsPage, PlansPage, SubscriptionsPage } from "./FinancePages";
 import type { PageProps } from "./pageTypes";
 import { CertificatesPage, EnrollmentsPage, ProgressPage, ReviewsPage, UsersPage } from "./UserPages";
 
+// Escolhe qual pagina renderizar com base na secao da rota atual.
 export function CurrentSection({ section, ...props }: PageProps & { section: string }) {
     const pages: Record<string, (props: PageProps) => ReactNode> = {
         dashboard: DashboardPage,

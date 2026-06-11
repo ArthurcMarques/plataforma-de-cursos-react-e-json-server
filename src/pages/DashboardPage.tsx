@@ -1,5 +1,6 @@
 import type { PageProps } from "./pageTypes";
 
+// Pagina inicial com atalhos para as principais secoes.
 export function DashboardPage({ data, navigate }: PageProps) {
     const cards = [
         { title: "Cursos", value: data.cursos.length, section: "cursos" },
