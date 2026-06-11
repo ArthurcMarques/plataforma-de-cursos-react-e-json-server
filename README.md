@@ -32,7 +32,14 @@ plataforma-cursos/
     models/
       types.ts
     pages/
+      AcademicPages.tsx
+      CurrentSection.tsx
+      DashboardPage.tsx
+      FinancePages.tsx
+      UserPages.tsx
+      pageTypes.ts
       routes.ts
+      shared.tsx
     services/
       api.ts
 ```
