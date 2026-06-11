@@ -23,13 +23,15 @@ plataforma-cursos/
   package.json
   src/
     App.tsx
-    api.ts
     main.tsx
-    types.ts
     utils.ts
     components/
       CrudPage.tsx
       Layout.tsx
+    models/
+      types.ts
+    services/
+      api.ts
 ```
 
 ## Funcionalidades implementadas

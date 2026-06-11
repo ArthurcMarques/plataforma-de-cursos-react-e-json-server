@@ -2,7 +2,7 @@ export function todayISO() {
     return new Date().toISOString().split("T")[0];
 }
 
-import type { RecordId } from "./types";
+import type { RecordId } from "./models/types";
 
 export function nextId(list: Array<{ id: RecordId }>) {
     if (list.length === 0) {

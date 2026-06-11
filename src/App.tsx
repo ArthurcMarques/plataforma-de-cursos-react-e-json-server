@@ -1,6 +1,5 @@
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { createRecord, deleteRecord, emptyAppData, fetchAppData, syncCollection, updateRecord } from "./api";
 import { CrudPage } from "./components/CrudPage";
 import { Layout, type SectionItem } from "./components/Layout";
 import type {
@@ -20,7 +19,8 @@ import type {
     Trilha,
     TrilhaCurso,
     Usuario
-} from "./types";
+} from "./models/types";
+import { createRecord, deleteRecord, emptyAppData, fetchAppData, syncCollection, updateRecord } from "./services/api";
 import { nameById, nextId, normalize, sameId, todayISO } from "./utils";
 
 const sections: SectionItem[] = [

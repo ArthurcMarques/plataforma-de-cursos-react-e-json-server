@@ -1,4 +1,4 @@
-import type { AppData, CollectionName, RecordId } from "./types";
+import type { AppData, CollectionName, RecordId } from "../models/types";
 
 type WithId = { id: RecordId };
 
