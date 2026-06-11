@@ -1,7 +1,8 @@
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { CrudPage } from "./components/CrudPage";
-import { Layout, type SectionItem } from "./components/Layout";
+import { Layout } from "./components/Layout";
 import type {
     AppData,
     Assinatura,
@@ -20,31 +21,17 @@ import type {
     TrilhaCurso,
     Usuario
 } from "./models/types";
+import { sectionByPath, sectionPaths, sections } from "./pages/routes";
 import { createRecord, deleteRecord, emptyAppData, fetchAppData, syncCollection, updateRecord } from "./services/api";
 import { nameById, nextId, normalize, sameId, todayISO } from "./utils";
-
-const sections: SectionItem[] = [
-    { id: "dashboard", name: "Início", group: "principal" },
-    { id: "categorias", name: "Categorias", group: "Acadêmico" },
-    { id: "cursos", name: "Cursos", group: "Acadêmico" },
-    { id: "modulos", name: "Módulos", group: "Acadêmico" },
-    { id: "aulas", name: "Aulas", group: "Acadêmico" },
-    { id: "trilhas", name: "Trilhas", group: "Acadêmico" },
-    { id: "usuarios", name: "Usuários", group: "Usuário" },
-    { id: "matriculas", name: "Matrículas", group: "Usuário" },
-    { id: "progresso", name: "Progresso", group: "Usuário" },
-    { id: "avaliacoes", name: "Avaliações", group: "Usuário" },
-    { id: "certificados", name: "Certificados", group: "Usuário" },
-    { id: "planos", name: "Planos", group: "Financeiro" },
-    { id: "assinaturas", name: "Assinaturas", group: "Financeiro" },
-    { id: "pagamentos", name: "Pagamentos", group: "Financeiro" }
-];
 
 type AlertState = { message: string; type: "success" | "warning" | "danger" } | null;
 type WithId = { id: RecordId };
 
 export function App() {
-    const [currentSection, setCurrentSection] = useState("dashboard");
+    const location = useLocation();
+    const navigate = useNavigate();
+    const currentSection = sectionByPath[location.pathname] ?? "dashboard";
     const [data, setData] = useState<AppData>(emptyAppData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -130,11 +117,15 @@ export function App() {
         }
     }
 
-    const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: setCurrentSection };
+    function navigateToSection(section: string) {
+        navigate(sectionPaths[section] ?? "/");
+    }
+
+    const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: navigateToSection };
 
     return (
         <>
-            <Layout sections={sections} currentSection={currentSection} onNavigate={setCurrentSection}>
+            <Layout sections={sections} currentSection={currentSection} onNavigate={navigateToSection}>
                 {alert && <div className={`alert alert-${alert.type} floating-alert shadow-sm`} role="alert">{alert.message}</div>}
                 {loading ? (
                     <section className="panel text-center text-muted">Carregando dados...</section>
@@ -144,7 +135,17 @@ export function App() {
                         <button className="btn btn-primary" type="button" onClick={() => void refreshData()}>Tentar novamente</button>
                     </section>
                 ) : (
-                    <CurrentSection section={currentSection} {...props} />
+                    <Routes>
+                        <Route path="/" element={<CurrentSection section="dashboard" {...props} />} />
+                        {sections.filter((section) => section.id !== "dashboard").map((section) => (
+                            <Route
+                                path={sectionPaths[section.id]}
+                                element={<CurrentSection section={section.id} {...props} />}
+                                key={section.id}
+                            />
+                        ))}
+                        <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
                 )}
             </Layout>
         </>

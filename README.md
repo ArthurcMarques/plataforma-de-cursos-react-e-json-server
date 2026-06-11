@@ -11,6 +11,7 @@ Documentação base do professor:
 - HTML5
 - Bootstrap 5
 - React 18
+- React Router DOM
 - TypeScript
 - Vite
 - JSON Server para API REST local
@@ -30,6 +31,8 @@ plataforma-cursos/
       Layout.tsx
     models/
       types.ts
+    pages/
+      routes.ts
     services/
       api.ts
 ```
@@ -64,6 +67,7 @@ plataforma-cursos/
 - Bloqueios simples de duplicidade em entidades chave.
 - Relacionamentos por ID entre entidades.
 - Cálculo de aulas e horas em cursos com base nas aulas cadastradas.
+- Roteamento com React Router DOM entre as seções da aplicação.
 
 ## Como executar
 
