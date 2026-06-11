@@ -7,7 +7,7 @@ import type { PageProps } from "./pageTypes";
 import { ActionButton, courseSummary, quickCreateCategory, quickCreateCourse, quickCreateLesson, quickCreateModule, quickCreateTrack, quickCreateUser, SelectInput, SimpleTable, TextInput } from "./shared";
 
 // Paginas do modulo academico: categorias, cursos, modulos, aulas e trilhas.
-export function CategoriesPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
+export function CategoriesPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     return (
         <CrudPage
             title="Categorias"
@@ -41,7 +41,12 @@ export function CategoriesPage({ data, addWithId, updateById, removeById, notify
                 updateById("categorias", item.id, { nome, descricao: form.descricao.trim() });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => removeById("categorias", item.id)}>Excluir</ActionButton>}
+            renderActions={(item) => (
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
+                    <ActionButton onClick={() => navigate("cursos")}>Cursos</ActionButton>
+                    <ActionButton danger onClick={() => removeById("categorias", item.id)}>Excluir</ActionButton>
+                </div>
+            )}
         />
     );
 }
@@ -110,7 +115,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
                 return true;
             }}
             renderActions={(item) => (
-                <div className="d-flex justify-content-center gap-2">
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
                     <ActionButton onClick={() => navigate("modulos")}>Módulos</ActionButton>
                     <ActionButton danger onClick={() => removeById("cursos", item.id)}>Excluir</ActionButton>
                 </div>
@@ -119,7 +124,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
     );
 }
 
-export function ModulesPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
+export function ModulesPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     const rows = data.modulos.map((item) => ({ ...item, cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     return (
@@ -160,12 +165,17 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify }:
                 updateById("modulos", item.id, { idCurso, titulo: form.titulo.trim(), ordem });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => removeById("modulos", item.id)}>Excluir</ActionButton>}
+            renderActions={(item) => (
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
+                    <ActionButton onClick={() => navigate("aulas")}>Aulas</ActionButton>
+                    <ActionButton danger onClick={() => removeById("modulos", item.id)}>Excluir</ActionButton>
+                </div>
+            )}
         />
     );
 }
 
-export function LessonsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
+export function LessonsPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     const rows = data.aulas.map((lesson) => {
         const module = data.modulos.find((item) => sameId(item.id, lesson.idModulo));
         return {
@@ -240,12 +250,17 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify }:
                 });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => removeById("aulas", item.id)}>Excluir</ActionButton>}
+            renderActions={(item) => (
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
+                    <ActionButton onClick={() => navigate("progresso")}>Progresso</ActionButton>
+                    <ActionButton danger onClick={() => removeById("aulas", item.id)}>Excluir</ActionButton>
+                </div>
+            )}
         />
     );
 }
 
-export function TracksPage({ data, addWithId, updateById, removeById, updateCollection, notify }: PageProps) {
+export function TracksPage({ data, addWithId, updateById, removeById, updateCollection, notify, navigate }: PageProps) {
     const [linkForm, setLinkForm] = useState({ idTrilha: "", idCurso: "", ordem: "" });
     const links = data.trilhasCursos.map((item) => ({
         ...item,
@@ -297,7 +312,12 @@ export function TracksPage({ data, addWithId, updateById, removeById, updateColl
                     updateById("trilhas", item.id, { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
                     return true;
                 }}
-                renderActions={(item) => <ActionButton danger onClick={() => removeById("trilhas", item.id)}>Excluir</ActionButton>}
+                renderActions={(item) => (
+                    <div className="d-flex justify-content-center gap-2 flex-wrap">
+                        <ActionButton onClick={() => navigate("cursos")}>Cursos</ActionButton>
+                        <ActionButton danger onClick={() => removeById("trilhas", item.id)}>Excluir</ActionButton>
+                    </div>
+                )}
             />
             <section className="panel">
                 <h2 className="h5 mb-3">Cursos da trilha</h2>

@@ -5,7 +5,7 @@ import type { PageProps } from "./pageTypes";
 import { ActionButton, money, quickCreatePlan, quickCreateSubscription, quickCreateUser, subscriptionDescription } from "./shared";
 
 // Paginas do modulo financeiro: planos, assinaturas e pagamentos.
-export function PlansPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
+export function PlansPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     return (
         <CrudPage
             title="Planos"
@@ -47,12 +47,17 @@ export function PlansPage({ data, addWithId, updateById, removeById, notify }: P
                 updateById("planos", item.id, { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracaoMeses: Number(form.duracaoMeses) });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => removeById("planos", item.id)}>Excluir</ActionButton>}
+            renderActions={(item) => (
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
+                    <ActionButton onClick={() => navigate("assinaturas")}>Assinaturas</ActionButton>
+                    <ActionButton danger onClick={() => removeById("planos", item.id)}>Excluir</ActionButton>
+                </div>
+            )}
         />
     );
 }
 
-export function SubscriptionsPage({ data, addWithId, updateById, removeById, notify }: PageProps) {
+export function SubscriptionsPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
     const rows = data.assinaturas.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), planoNome: nameById(data.planos, item.idPlano, "nome") }));
 
     return (
@@ -88,7 +93,12 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, not
                 updateById("assinaturas", item.id, { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => removeById("assinaturas", item.id)}>Excluir</ActionButton>}
+            renderActions={(item) => (
+                <div className="d-flex justify-content-center gap-2 flex-wrap">
+                    <ActionButton onClick={() => navigate("pagamentos")}>Pagamentos</ActionButton>
+                    <ActionButton danger onClick={() => removeById("assinaturas", item.id)}>Excluir</ActionButton>
+                </div>
+            )}
         />
     );
 }
