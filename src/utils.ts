@@ -5,15 +5,6 @@ export function todayISO() {
     return new Date().toISOString().split("T")[0];
 }
 
-// Gera o proximo id baseado nos registros ja carregados.
-export function nextId(list: Array<{ id: RecordId }>) {
-    if (list.length === 0) {
-        return 1;
-    }
-
-    return Math.max(...list.map((item) => Number(item.id) || 0)) + 1;
-}
-
 // Normaliza textos para validacoes simples.
 export function normalize(value: unknown) {
     return String(value ?? "").trim().toLowerCase();

@@ -2,7 +2,7 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { CrudPage } from "../components/CrudPage";
 import type { Aula, Curso } from "../models/types";
-import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
+import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, courseSummary, quickCreateCategory, quickCreateCourse, quickCreateLesson, quickCreateModule, quickCreateTrack, quickCreateUser, SelectInput, SimpleTable, TextInput } from "./shared";
 
@@ -260,7 +260,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
     );
 }
 
-export function TracksPage({ data, addWithId, updateById, removeById, updateCollection, notify, navigate }: PageProps) {
+export function TracksPage({ data, addWithId, addDirect, updateById, removeById, removeDirect, notify, navigate }: PageProps) {
     const [linkForm, setLinkForm] = useState({ idTrilha: "", idCurso: "", ordem: "" });
     const links = data.trilhasCursos.map((item) => ({
         ...item,
@@ -276,7 +276,7 @@ export function TracksPage({ data, addWithId, updateById, removeById, updateColl
             notify("Esse curso já está vinculado a essa trilha.", "danger");
             return;
         }
-        await updateCollection("trilhasCursos", (list) => [...list, { id: nextId(list), idTrilha, idCurso, ordem: Number(linkForm.ordem) }]);
+        await addDirect("trilhasCursos", { idTrilha, idCurso, ordem: Number(linkForm.ordem) });
         setLinkForm({ idTrilha: "", idCurso: "", ordem: "" });
         notify("Curso vinculado à trilha.");
     }
@@ -335,7 +335,7 @@ export function TracksPage({ data, addWithId, updateById, removeById, updateColl
                     item.trilhaNome,
                     item.cursoNome,
                     item.ordem,
-                    <ActionButton danger onClick={() => updateCollection("trilhasCursos", (list) => list.filter((record) => !(sameId(record.idTrilha, item.idTrilha) && sameId(record.idCurso, item.idCurso))))}>Excluir</ActionButton>
+                    <ActionButton danger onClick={() => removeDirect("trilhasCursos", item.id)}>Excluir</ActionButton>
                 ])}
             />
         </>

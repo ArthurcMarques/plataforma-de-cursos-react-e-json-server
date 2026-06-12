@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CrudPage } from "../components/CrudPage";
 import type { Curso, RecordId, Usuario } from "../models/types";
-import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
+import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, quickCreateCourse, quickCreateUser, SelectInput } from "./shared";
 
@@ -118,7 +118,7 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
     );
 }
 
-export function ProgressPage({ data, addWithId, updateCollection, notify }: PageProps) {
+export function ProgressPage({ data, addWithId, addDirect, removeDirect, notify }: PageProps) {
     const [selectedUserId, setSelectedUserId] = useState("");
     const idUsuario = Number(selectedUserId);
     const selectedUser = data.usuarios.find((item) => sameId(item.id, idUsuario));
@@ -135,14 +135,15 @@ export function ProgressPage({ data, addWithId, updateCollection, notify }: Page
             return;
         }
 
-        updateCollection("progressoAulas", (list) => {
-            const withoutCurrent = list.filter((item) => !(sameId(item.idUsuario, idUsuario) && sameId(item.idAula, idAula)));
-            if (!checked) {
-                return withoutCurrent;
-            }
+        const current = data.progressoAulas.find((item) => sameId(item.idUsuario, idUsuario) && sameId(item.idAula, idAula));
+        if (!checked && current) {
+            await removeDirect("progressoAulas", current.id);
+            return;
+        }
 
-            return [...withoutCurrent, { id: nextId(list), idUsuario, idAula: Number(idAula), status: "Concluído", dataConclusao: todayISO() }];
-        });
+        if (checked && !current) {
+            await addDirect("progressoAulas", { idUsuario, idAula: Number(idAula), status: "Concluído", dataConclusao: todayISO() });
+        }
     }
 
     function courseProgress(course: Curso) {
@@ -284,7 +285,7 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, notify, n
     );
 }
 
-export function CertificatesPage({ data, addWithId, updateById, updateCollection, notify }: PageProps) {
+export function CertificatesPage({ data, addWithId, addDirect, updateById, removeById, notify }: PageProps) {
     const rows = data.certificados.map((item) => ({ ...item, usuarioNome: nameById(data.usuarios, item.idUsuario, "nomeCompleto"), cursoNome: nameById(data.cursos, item.idCurso, "titulo") }));
 
     function hasCompletedProgress(idUsuario: number, idCurso: number) {
@@ -322,10 +323,7 @@ export function CertificatesPage({ data, addWithId, updateById, updateCollection
                     notify("Registre progresso concluído em uma aula desse curso antes de gerar certificado.", "danger");
                     return false;
                 }
-                updateCollection("certificados", (list) => {
-                    const id = nextId(list);
-                    return [...list, { id, idUsuario, idCurso, idTrilha: null, codigoVerificacao: `CERT-${String(id).padStart(3, "0")}`, dataEmissao: form.dataEmissao }];
-                });
+                addDirect("certificados", { idUsuario, idCurso, idTrilha: null, codigoVerificacao: `CERT-${Date.now()}`, dataEmissao: form.dataEmissao });
                 notify("Certificado gerado com sucesso.");
                 return true;
             }}
@@ -344,7 +342,7 @@ export function CertificatesPage({ data, addWithId, updateById, updateCollection
                 updateById("certificados", item.id, { idUsuario, idCurso, dataEmissao: form.dataEmissao });
                 return true;
             }}
-            renderActions={(item) => <ActionButton danger onClick={() => updateCollection("certificados", (list) => list.filter((record) => !sameId(record.id, item.id)))}>Excluir</ActionButton>}
+            renderActions={(item) => <ActionButton danger onClick={() => removeById("certificados", item.id)}>Excluir</ActionButton>}
         />
     );
 }

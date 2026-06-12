@@ -37,4 +37,7 @@ export const sectionPaths: Record<string, string> = {
 };
 
 // Permite descobrir a secao atual a partir da URL.
-export const sectionByPath = Object.fromEntries(Object.entries(sectionPaths).map(([section, path]) => [path, section]));
+export function getSectionByPath(pathname: string) {
+    const found = sections.find((section) => sectionPaths[section.id] === pathname);
+    return found ? found.id : "dashboard";
+}

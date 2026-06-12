@@ -4,8 +4,8 @@ import { Layout } from "./components/Layout";
 import type { AppData, CollectionName, RecordId } from "./models/types";
 import { CurrentSection } from "./pages/CurrentSection";
 import type { PageProps } from "./pages/pageTypes";
-import { sectionByPath, sectionPaths, sections } from "./pages/routes";
-import { createRecord, deleteRecord, emptyAppData, fetchAppData, syncCollection, updateRecord } from "./services/api";
+import { getSectionByPath, sectionPaths, sections } from "./pages/routes";
+import { createRecord, deleteRecord, emptyAppData, fetchAppData, updateRecord } from "./services/api";
 
 type AlertState = { message: string; type: "success" | "warning" | "danger" } | null;
 type WithId = { id: RecordId };
@@ -14,7 +14,7 @@ export function App() {
     // Identifica a pagina atual pela URL.
     const location = useLocation();
     const navigate = useNavigate();
-    const currentSection = sectionByPath[location.pathname] ?? "dashboard";
+    const currentSection = getSectionByPath(location.pathname);
 
     // Estado principal compartilhado entre todas as paginas.
     const [data, setData] = useState<AppData>(emptyAppData);
@@ -44,31 +44,22 @@ export function App() {
         window.setTimeout(() => setAlert(null), 2800);
     }
 
-    // Sincroniza alteracoes de listas completas, como progresso e vinculos.
-    async function updateCollection(name: CollectionName, updater: (list: any[]) => any[]) {
-        const previousList = data[name] as any[];
-        const updated = updater(previousList);
-        setData((current) => ({ ...current, [name]: updated }));
-
-        try {
-            const saved = await syncCollection(name, previousList, updated);
-            setData((current) => ({ ...current, [name]: saved }));
-            return saved;
-        } catch {
-            setData((current) => ({ ...current, [name]: previousList }));
-            notify("Não foi possível salvar as alterações no servidor.", "danger");
-            return undefined;
+    // Cria um registro novo na API e atualiza a tela.
+    async function addWithId(name: CollectionName, record: any) {
+        const saved = await addDirect(name, record);
+        if (saved) {
+            notify("Registro salvo com sucesso.");
         }
     }
 
-    // Cria um registro novo na API e atualiza a tela.
-    async function addWithId(name: CollectionName, record: any) {
+    async function addDirect(name: CollectionName, record: any) {
         try {
             const saved = await createRecord(name, record);
             setData((current) => ({ ...current, [name]: [...current[name], saved] }));
-            notify("Registro salvo com sucesso.");
+            return saved;
         } catch {
             notify("Não foi possível salvar o registro no servidor.", "danger");
+            return null;
         }
     }
 
@@ -78,16 +69,24 @@ export function App() {
             return;
         }
 
+        const removed = await removeDirect(name, id);
+        if (removed) {
+            notify("Registro removido com sucesso.", "warning");
+        }
+    }
+
+    async function removeDirect(name: CollectionName, id: RecordId) {
         const previousList = data[name] as any[];
         const updated = (previousList as WithId[]).filter((item) => Number(item.id) !== Number(id));
         setData((current) => ({ ...current, [name]: updated }));
 
         try {
             await deleteRecord(name, id);
-            notify("Registro removido com sucesso.", "warning");
+            return true;
         } catch {
             setData((current) => ({ ...current, [name]: previousList }));
             notify("Não foi possível remover o registro no servidor.", "danger");
+            return false;
         }
     }
 
@@ -112,7 +111,7 @@ export function App() {
     }
 
     // Props reutilizadas pelas paginas de CRUD.
-    const props: PageProps = { data, addWithId, updateById, removeById, updateCollection, notify, navigate: navigateToSection };
+    const props: PageProps = { data, addWithId, addDirect, updateById, removeById, removeDirect, notify, navigate: navigateToSection };
 
     return (
         <>

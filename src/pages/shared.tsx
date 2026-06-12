@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { AppData, Aula, Curso, RecordId, Usuario } from "../models/types";
 import type { PageProps } from "./pageTypes";
-import { nameById, nextId, normalize, sameId, todayISO } from "../utils";
+import { nameById, normalize, sameId, todayISO } from "../utils";
 
 // Monta os dados calculados exibidos na tabela de cursos.
 export function courseSummary(data: AppData, course: Curso) {
