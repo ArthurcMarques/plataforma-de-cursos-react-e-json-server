@@ -1,6 +1,7 @@
 // Pagina de matriculas: liga usuarios a cursos.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SimpleTable } from "./shared";
@@ -60,10 +61,7 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Matriculas</h1>
-                <p className="text-muted mb-0">Simule a matricula de usuarios em cursos.</p>
-            </section>
+            <PageHeader title="Matriculas" description="Simule a matricula de usuarios em cursos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando matricula.</p>}
                 <form className="row g-3" onSubmit={saveEnrollment}>

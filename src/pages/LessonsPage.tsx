@@ -1,6 +1,7 @@
 // Pagina de aulas: cadastra aulas dentro dos modulos.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import type { Aula } from "../models/types";
 import { nameById, sameId } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -82,10 +83,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Aulas</h1>
-                <p className="text-muted mb-0">Cadastre aulas dentro dos modulos.</p>
-            </section>
+            <PageHeader title="Aulas" description="Cadastre aulas dentro dos modulos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando aula.</p>}
                 <form className="row g-3" onSubmit={saveLesson}>

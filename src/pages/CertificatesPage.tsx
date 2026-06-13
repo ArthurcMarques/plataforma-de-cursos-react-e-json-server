@@ -1,6 +1,7 @@
 // Pagina de certificados: gera certificados para alunos com progresso.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SimpleTable } from "./shared";
@@ -74,10 +75,7 @@ export function CertificatesPage({ data, addDirect, updateById, removeById, noti
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Certificados</h1>
-                <p className="text-muted mb-0">Gere certificados para usuarios com progresso concluido no curso.</p>
-            </section>
+            <PageHeader title="Certificados" description="Gere certificados para usuarios com progresso concluido no curso." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando certificado.</p>}
                 <form className="row g-3" onSubmit={saveCertificate}>

@@ -1,6 +1,7 @@
 // Pagina de avaliacoes: registra notas e comentarios dos cursos.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SimpleTable } from "./shared";
@@ -62,10 +63,7 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, navigate 
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Avaliacoes</h1>
-                <p className="text-muted mb-0">Registre avaliacoes de usuarios para os cursos.</p>
-            </section>
+            <PageHeader title="Avaliacoes" description="Registre avaliacoes de usuarios para os cursos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando avaliacao.</p>}
                 <form className="row g-3" onSubmit={saveReview}>

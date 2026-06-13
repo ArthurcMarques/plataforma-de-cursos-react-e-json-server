@@ -1,6 +1,7 @@
 // Pagina de cursos: cadastra cursos e relaciona categoria e instrutor.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import type { Curso } from "../models/types";
 import { todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -71,10 +72,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Cursos</h1>
-                <p className="text-muted mb-0">Cadastre cursos e vincule categoria e instrutor.</p>
-            </section>
+            <PageHeader title="Cursos" description="Cadastre cursos e vincule categoria e instrutor." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando curso.</p>}
                 <form className="row g-3" onSubmit={saveCourse}>

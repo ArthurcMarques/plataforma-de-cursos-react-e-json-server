@@ -1,5 +1,6 @@
 // Pagina de progresso: marca aulas concluidas por aluno.
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import type { Curso, RecordId } from "../models/types";
 import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -44,10 +45,7 @@ export function ProgressPage({ data, addDirect, removeDirect, notify }: PageProp
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Progresso</h1>
-                <p className="text-muted mb-0">Selecione um aluno e marque as aulas concluidas em cada curso.</p>
-            </section>
+            <PageHeader title="Progresso" description="Selecione um aluno e marque as aulas concluidas em cada curso." />
             <section className="panel">
                 <div className="row g-3 align-items-end">
                     <SelectInput

@@ -1,6 +1,7 @@
 // Pagina de assinaturas: vincula usuarios a planos.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SimpleTable } from "./shared";
@@ -53,10 +54,7 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, nav
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Assinaturas</h1>
-                <p className="text-muted mb-0">Vincule usuarios a planos por periodo.</p>
-            </section>
+            <PageHeader title="Assinaturas" description="Vincule usuarios a planos por periodo." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando assinatura.</p>}
                 <form className="row g-3" onSubmit={saveSubscription}>

@@ -1,6 +1,7 @@
 // Pagina de planos: cadastra planos financeiros.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { normalize, sameId } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, money, SimpleTable } from "./shared";
@@ -54,10 +55,7 @@ export function PlansPage({ data, addWithId, updateById, removeById, notify, nav
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Planos</h1>
-                <p className="text-muted mb-0">Defina planos para simular assinaturas e pagamentos.</p>
-            </section>
+            <PageHeader title="Planos" description="Defina planos para simular assinaturas e pagamentos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando plano.</p>}
                 <form className="row g-3" onSubmit={savePlan}>

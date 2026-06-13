@@ -1,6 +1,7 @@
 // Pagina de pagamentos: registra pagamentos das assinaturas.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import type { Pagamento } from "../models/types";
 import { normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -68,10 +69,7 @@ export function PaymentsPage({ data, addWithId, updateById, removeById, notify }
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Pagamentos</h1>
-                <p className="text-muted mb-0">Registre pagamentos simulados para assinaturas.</p>
-            </section>
+            <PageHeader title="Pagamentos" description="Registre pagamentos simulados para assinaturas." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando pagamento.</p>}
                 <form className="row g-3" onSubmit={savePayment}>

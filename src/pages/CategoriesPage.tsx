@@ -1,5 +1,6 @@
 // Pagina de categorias: cadastra, edita, lista e exclui categorias.
 import type { FormEvent } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { useState } from "react";
 import { normalize, sameId } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -49,10 +50,7 @@ export function CategoriesPage({ data, addWithId, updateById, removeById, notify
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Categorias</h1>
-                <p className="text-muted mb-0">Organize os cursos por area de conhecimento.</p>
-            </section>
+            <PageHeader title="Categorias" description="Organize os cursos por area de conhecimento." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando categoria.</p>}
                 <form className="row g-3" onSubmit={saveCategory}>

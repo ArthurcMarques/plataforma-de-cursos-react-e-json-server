@@ -1,6 +1,7 @@
 // Pagina de usuarios: cadastra alunos e instrutores.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import type { Usuario } from "../models/types";
 import { normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
@@ -60,10 +61,7 @@ export function UsersPage({ data, addWithId, updateById, removeById, notify, nav
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Usuarios</h1>
-                <p className="text-muted mb-0">Cadastre alunos e instrutores para uso nas demais telas.</p>
-            </section>
+            <PageHeader title="Usuarios" description="Cadastre alunos e instrutores para uso nas demais telas." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando usuario.</p>}
                 <form className="row g-3" onSubmit={saveUser}>

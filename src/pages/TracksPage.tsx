@@ -1,6 +1,7 @@
 // Pagina de trilhas: cadastra trilhas e vincula cursos a elas.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, sameId } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SelectInput, SimpleTable, TextInput } from "./shared";
@@ -65,10 +66,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Trilhas</h1>
-                <p className="text-muted mb-0">Crie trilhas de conhecimento e relacione cursos.</p>
-            </section>
+            <PageHeader title="Trilhas" description="Crie trilhas de conhecimento e relacione cursos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando trilha.</p>}
                 <form className="row g-3" onSubmit={saveTrack}>

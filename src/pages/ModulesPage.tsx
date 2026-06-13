@@ -1,6 +1,7 @@
 // Pagina de modulos: organiza modulos dentro de cada curso.
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { PageHeader } from "../components/PageHeader";
 import { nameById, sameId } from "../utils";
 import type { PageProps } from "./pageTypes";
 import { ActionButton, SimpleTable } from "./shared";
@@ -57,10 +58,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
 
     return (
         <>
-            <section className="panel">
-                <h1 className="h3 mb-2">Modulos</h1>
-                <p className="text-muted mb-0">Organize modulos dentro dos cursos.</p>
-            </section>
+            <PageHeader title="Modulos" description="Organize modulos dentro dos cursos." />
             <section className="panel">
                 {editingId !== null && <p className="edit-banner">Editando modulo.</p>}
                 <form className="row g-3" onSubmit={saveModule}>
