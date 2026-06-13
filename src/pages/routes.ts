@@ -1,43 +1,29 @@
 import type { SectionItem } from "../components/Layout";
 
-// Configuracao das secoes exibidas no menu.
+// Cada item define o menu e tambem a rota da pagina.
 export const sections: SectionItem[] = [
-    { id: "dashboard", name: "Início", group: "principal" },
-    { id: "categorias", name: "Categorias", group: "Acadêmico" },
-    { id: "cursos", name: "Cursos", group: "Acadêmico" },
-    { id: "modulos", name: "Módulos", group: "Acadêmico" },
-    { id: "aulas", name: "Aulas", group: "Acadêmico" },
-    { id: "trilhas", name: "Trilhas", group: "Acadêmico" },
-    { id: "usuarios", name: "Usuários", group: "Usuário" },
-    { id: "matriculas", name: "Matrículas", group: "Usuário" },
-    { id: "progresso", name: "Progresso", group: "Usuário" },
-    { id: "avaliacoes", name: "Avaliações", group: "Usuário" },
-    { id: "certificados", name: "Certificados", group: "Usuário" },
-    { id: "planos", name: "Planos", group: "Financeiro" },
-    { id: "assinaturas", name: "Assinaturas", group: "Financeiro" },
-    { id: "pagamentos", name: "Pagamentos", group: "Financeiro" }
+    { id: "dashboard", name: "Início", path: "/", group: "principal" },
+    { id: "categorias", name: "Categorias", path: "/categorias", group: "Acadêmico" },
+    { id: "cursos", name: "Cursos", path: "/cursos", group: "Acadêmico" },
+    { id: "modulos", name: "Módulos", path: "/modulos", group: "Acadêmico" },
+    { id: "aulas", name: "Aulas", path: "/aulas", group: "Acadêmico" },
+    { id: "trilhas", name: "Trilhas", path: "/trilhas", group: "Acadêmico" },
+    { id: "usuarios", name: "Usuários", path: "/usuarios", group: "Usuário" },
+    { id: "matriculas", name: "Matrículas", path: "/matriculas", group: "Usuário" },
+    { id: "progresso", name: "Progresso", path: "/progresso", group: "Usuário" },
+    { id: "avaliacoes", name: "Avaliações", path: "/avaliacoes", group: "Usuário" },
+    { id: "certificados", name: "Certificados", path: "/certificados", group: "Usuário" },
+    { id: "planos", name: "Planos", path: "/planos", group: "Financeiro" },
+    { id: "assinaturas", name: "Assinaturas", path: "/assinaturas", group: "Financeiro" },
+    { id: "pagamentos", name: "Pagamentos", path: "/pagamentos", group: "Financeiro" }
 ];
 
-// Caminhos usados pelo React Router.
-export const sectionPaths: Record<string, string> = {
-    dashboard: "/",
-    categorias: "/categorias",
-    cursos: "/cursos",
-    modulos: "/modulos",
-    aulas: "/aulas",
-    trilhas: "/trilhas",
-    usuarios: "/usuarios",
-    matriculas: "/matriculas",
-    progresso: "/progresso",
-    avaliacoes: "/avaliacoes",
-    certificados: "/certificados",
-    planos: "/planos",
-    assinaturas: "/assinaturas",
-    pagamentos: "/pagamentos"
-};
-
-// Permite descobrir a secao atual a partir da URL.
 export function getSectionByPath(pathname: string) {
-    const found = sections.find((section) => sectionPaths[section.id] === pathname);
+    const found = sections.find((section) => section.path === pathname);
     return found ? found.id : "dashboard";
+}
+
+export function getPathBySection(sectionId: string) {
+    const found = sections.find((section) => section.id === sectionId);
+    return found ? found.path : "/";
 }

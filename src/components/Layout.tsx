@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 export interface SectionItem {
     id: string;
     name: string;
+    path: string;
     group: "principal" | "Acadêmico" | "Usuário" | "Financeiro";
 }
 
