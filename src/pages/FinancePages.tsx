@@ -44,8 +44,7 @@ export function PlansPage({ data, addWithId, updateById, removeById, notify, nav
                     notify("Já existe um plano com esse nome.", "danger");
                     return false;
                 }
-                updateById("planos", item.id, { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracaoMeses: Number(form.duracaoMeses) });
-                return true;
+                return updateById("planos", item.id, { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracaoMeses: Number(form.duracaoMeses) });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -90,8 +89,7 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, not
                 dataFim: item.dataFim
             })}
             onUpdate={(item, form) => {
-                updateById("assinaturas", item.id, { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
-                return true;
+                return updateById("assinaturas", item.id, { idUsuario: Number(form.idUsuario), idPlano: Number(form.idPlano), dataInicio: form.dataInicio, dataFim: form.dataFim });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -153,14 +151,13 @@ export function PaymentsPage({ data, addWithId, updateById, removeById, notify }
                     notify("Já existe pagamento com esse ID de transação.", "danger");
                     return false;
                 }
-                updateById("pagamentos", item.id, {
+                return updateById("pagamentos", item.id, {
                     idAssinatura: Number(form.idAssinatura),
                     valorPago: Number(form.valorPago),
                     dataPagamento: form.dataPagamento,
                     metodoPagamento: form.metodoPagamento as Pagamento["metodoPagamento"],
                     idTransacaoGateway: form.idTransacaoGateway.trim()
                 });
-                return true;
             }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("pagamentos", item.id)}>Excluir</ActionButton>}
         />

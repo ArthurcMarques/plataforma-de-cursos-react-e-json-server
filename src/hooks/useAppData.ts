@@ -21,7 +21,7 @@ export function useAppData() {
             setData(await fetchAppData());
             setError(null);
         } catch {
-            setError("Não foi possível carregar os dados. Verifique se o JSON Server está rodando.");
+            setError("Nao foi possivel carregar os dados. Verifique se o JSON Server esta rodando.");
         } finally {
             setLoading(false);
         }
@@ -45,7 +45,7 @@ export function useAppData() {
             setData((current) => ({ ...current, [name]: [...current[name], saved] }));
             return saved;
         } catch {
-            notify("Não foi possível salvar o registro no servidor.", "danger");
+            notify("Nao foi possivel salvar o registro no servidor.", "danger");
             return null;
         }
     }
@@ -71,7 +71,7 @@ export function useAppData() {
             return true;
         } catch {
             setData((current) => ({ ...current, [name]: previousList }));
-            notify("Não foi possível remover o registro no servidor.", "danger");
+            notify("Nao foi possivel remover o registro no servidor.", "danger");
             return false;
         }
     }
@@ -86,8 +86,10 @@ export function useAppData() {
                 })
             }));
             notify("Registro atualizado com sucesso.");
+            return true;
         } catch {
-            notify("Não foi possível atualizar o registro no servidor.", "danger");
+            notify("Nao foi possivel atualizar o registro no servidor.", "danger");
+            return false;
         }
     }
 

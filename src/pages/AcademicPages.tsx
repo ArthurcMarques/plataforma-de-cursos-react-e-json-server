@@ -38,8 +38,7 @@ export function CategoriesPage({ data, addWithId, updateById, removeById, notify
                     notify("Já existe uma categoria com esse nome.", "danger");
                     return false;
                 }
-                updateById("categorias", item.id, { nome, descricao: form.descricao.trim() });
-                return true;
+                return updateById("categorias", item.id, { nome, descricao: form.descricao.trim() });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -104,7 +103,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
                 dataPublicacao: item.dataPublicacao
             })}
             onUpdate={(item, form) => {
-                updateById("cursos", item.id, {
+                return updateById("cursos", item.id, {
                     titulo: form.titulo.trim(),
                     descricao: form.descricao.trim(),
                     nivel: form.nivel as Curso["nivel"],
@@ -112,7 +111,6 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
                     idInstrutor: Number(form.idInstrutor),
                     dataPublicacao: form.dataPublicacao
                 });
-                return true;
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -162,8 +160,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
                     notify("Já existe um módulo com essa ordem neste curso.", "danger");
                     return false;
                 }
-                updateById("modulos", item.id, { idCurso, titulo: form.titulo.trim(), ordem });
-                return true;
+                return updateById("modulos", item.id, { idCurso, titulo: form.titulo.trim(), ordem });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -240,7 +237,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
                     notify("Já existe uma aula com essa ordem neste módulo.", "danger");
                     return false;
                 }
-                updateById("aulas", item.id, {
+                return updateById("aulas", item.id, {
                     idModulo,
                     titulo: form.titulo.trim(),
                     tipoConteudo: form.tipoConteudo as Aula["tipoConteudo"],
@@ -248,7 +245,6 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
                     duracaoMinutos: Number(form.duracaoMinutos),
                     ordem
                 });
-                return true;
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -309,8 +305,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
                     idCategoria: String(item.idCategoria)
                 })}
                 onUpdate={(item, form) => {
-                    updateById("trilhas", item.id, { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
-                    return true;
+                    return updateById("trilhas", item.id, { titulo: form.titulo.trim(), descricao: form.descricao.trim(), idCategoria: Number(form.idCategoria) });
                 }}
                 renderActions={(item) => (
                     <div className="d-flex justify-content-center gap-2 flex-wrap">

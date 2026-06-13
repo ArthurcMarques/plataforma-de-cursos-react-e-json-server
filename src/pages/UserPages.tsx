@@ -48,8 +48,7 @@ export function UsersPage({ data, addWithId, updateById, removeById, notify, nav
                     notify("Já existe um usuário com esse e-mail.", "danger");
                     return false;
                 }
-                updateById("usuarios", item.id, { ...form, email, tipoUsuario: form.tipoUsuario as Usuario["tipoUsuario"] });
-                return true;
+                return updateById("usuarios", item.id, { ...form, email, tipoUsuario: form.tipoUsuario as Usuario["tipoUsuario"] });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -104,8 +103,7 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
                     notify("Esse usuário já está matriculado nesse curso.", "danger");
                     return false;
                 }
-                updateById("matriculas", item.id, { idUsuario, idCurso, dataMatricula: form.dataMatricula });
-                return true;
+                return updateById("matriculas", item.id, { idUsuario, idCurso, dataMatricula: form.dataMatricula });
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -264,14 +262,13 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, notify, n
                 dataAvaliacao: item.dataAvaliacao
             })}
             onUpdate={(item, form) => {
-                updateById("avaliacoes", item.id, {
+                return updateById("avaliacoes", item.id, {
                     idUsuario: Number(form.idUsuario),
                     idCurso: Number(form.idCurso),
                     nota: Number(form.nota),
                     comentario: form.comentario.trim(),
                     dataAvaliacao: form.dataAvaliacao
                 });
-                return true;
             }}
             renderActions={(item) => (
                 <div className="d-flex justify-content-center gap-2 flex-wrap">
@@ -337,8 +334,7 @@ export function CertificatesPage({ data, addWithId, addDirect, updateById, remov
                     notify("Já existe certificado para esse usuário nesse curso.", "danger");
                     return false;
                 }
-                updateById("certificados", item.id, { idUsuario, idCurso, dataEmissao: form.dataEmissao });
-                return true;
+                return updateById("certificados", item.id, { idUsuario, idCurso, dataEmissao: form.dataEmissao });
             }}
             renderActions={(item) => <ActionButton danger onClick={() => removeById("certificados", item.id)}>Excluir</ActionButton>}
         />
