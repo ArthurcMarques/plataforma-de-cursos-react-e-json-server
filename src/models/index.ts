@@ -1,3 +1,5 @@
+// Arquivo central dos models.
+// Exporta as classes, junta os schemas e define o formato geral dos dados.
 export type { CollectionName, RecordId } from "./common";
 export { Usuario } from "./Usuario";
 export { Categoria } from "./Categoria";
@@ -46,6 +48,7 @@ export const modelSchemas = {
     pagamentos: Pagamento.schema
 };
 
+// Estrutura completa carregada do JSON Server.
 export interface AppData {
     usuarios: Usuario[];
     categorias: Categoria[];

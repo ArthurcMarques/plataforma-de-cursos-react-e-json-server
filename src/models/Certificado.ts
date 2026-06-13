@@ -1,3 +1,4 @@
+// Model de certificado emitido para usuario.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

@@ -1,3 +1,4 @@
+// Pagina de trilhas: cadastra trilhas e vincula cursos a elas.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, sameId } from "../utils";
@@ -25,6 +26,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
 
     async function saveTrack(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Salva uma trilha nova ou atualiza a trilha em edicao.
         const track = { titulo: titulo.trim(), descricao: descricao.trim(), idCategoria: Number(idCategoria) };
 
         if (editingId !== null) {
@@ -49,6 +51,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
 
     async function submitLink(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Evita vincular o mesmo curso duas vezes na mesma trilha.
         const idTrilha = Number(linkForm.idTrilha);
         const idCurso = Number(linkForm.idCurso);
         if (data.trilhasCursos.some((item) => sameId(item.idTrilha, idTrilha) && sameId(item.idCurso, idCurso))) {

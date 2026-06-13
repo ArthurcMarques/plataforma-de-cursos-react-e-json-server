@@ -1,3 +1,4 @@
+// Model de matricula de usuario em curso.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

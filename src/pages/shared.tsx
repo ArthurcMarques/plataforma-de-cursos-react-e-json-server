@@ -1,3 +1,4 @@
+// Componentes e funcoes reutilizadas por varias paginas.
 import type { ReactNode } from "react";
 import type { AppData, Curso, RecordId } from "../models/types";
 import { nameById, sameId } from "../utils";
@@ -27,6 +28,7 @@ export function subscriptionDescription(data: AppData, idAssinatura: RecordId) {
 }
 
 export function money(value: number) {
+    // Formata numero para exibicao simples em reais.
     return `R$ ${Number(value).toFixed(2)}`;
 }
 

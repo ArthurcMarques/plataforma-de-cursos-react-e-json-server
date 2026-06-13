@@ -1,3 +1,4 @@
+// Pagina de aulas: cadastra aulas dentro dos modulos.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import type { Aula } from "../models/types";
@@ -34,6 +35,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
 
     async function saveLesson(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Nao permite duas aulas com a mesma ordem no mesmo modulo.
         const moduleId = Number(idModulo);
         const order = Number(ordem);
         const repeated = data.aulas.some((item) => {
@@ -67,6 +69,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
     }
 
     function editLesson(lesson: Aula) {
+        // Preenche o formulario com a aula escolhida.
         setEditingId(lesson.id);
         setIdModulo(String(lesson.idModulo));
         setTitulo(lesson.titulo);

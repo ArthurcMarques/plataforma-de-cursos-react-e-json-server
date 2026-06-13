@@ -1,3 +1,4 @@
+// Model de trilha de conhecimento.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

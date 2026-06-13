@@ -1,3 +1,4 @@
+/* Variaveis de cores e efeitos usados no layout. */
 :root {
     --brand-ink: #1f2a44;
     --brand-ink-soft: #41506f;
@@ -18,6 +19,7 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+/* Barra de navegacao superior. */
 .app-nav {
     background-color: rgba(255, 253, 247, 0.92);
     border-bottom: 1px solid rgba(233, 222, 205, 0.9);
@@ -57,11 +59,13 @@ body {
     color: var(--brand-ink);
 }
 
+/* Container principal das paginas. */
 .app-main {
     padding-bottom: 2.75rem;
     padding-top: 2.75rem;
 }
 
+/* Painel base usado em formularios, tabelas e blocos de conteudo. */
 .panel {
     background: var(--brand-card);
     border: 1px solid var(--brand-line);
@@ -76,6 +80,7 @@ body {
     margin-top: 1.25rem;
 }
 
+/* Destaque da tela inicial. */
 .hero-panel {
     padding: 2.25rem;
     text-align: center;

@@ -1,3 +1,4 @@
+// Tipos das props que todas as paginas recebem.
 import type { AppData, CollectionName, RecordId } from "../models/types";
 
 // Contrato compartilhado por todas as paginas.

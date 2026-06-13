@@ -1,3 +1,4 @@
+// Pagina de avaliacoes: registra notas e comentarios dos cursos.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, todayISO } from "../utils";
@@ -28,6 +29,7 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, navigate 
 
     async function saveReview(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Monta a avaliacao usando os ids selecionados nos selects.
         const review = {
             idUsuario: Number(idUsuario),
             idCurso: Number(idCurso),

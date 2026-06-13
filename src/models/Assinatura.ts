@@ -1,3 +1,4 @@
+// Model de assinatura de usuario em um plano.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

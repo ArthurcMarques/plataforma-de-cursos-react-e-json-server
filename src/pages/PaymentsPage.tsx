@@ -1,3 +1,4 @@
+// Pagina de pagamentos: registra pagamentos das assinaturas.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import type { Pagamento } from "../models/types";
@@ -25,6 +26,7 @@ export function PaymentsPage({ data, addWithId, updateById, removeById, notify }
 
     async function savePayment(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // O id da transacao evita pagamentos duplicados.
         const repeated = data.pagamentos.some((item) => {
             return !sameId(item.id, editingId) && normalize(item.idTransacaoGateway) === normalize(idTransacaoGateway);
         });

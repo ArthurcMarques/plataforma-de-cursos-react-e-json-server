@@ -1,3 +1,4 @@
+// Pagina de categorias: cadastra, edita, lista e exclui categorias.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { normalize, sameId } from "../utils";
@@ -17,6 +18,7 @@ export function CategoriesPage({ data, addWithId, updateById, removeById, notify
 
     async function saveCategory(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Se editingId tiver valor, salva como edicao; senao, cria novo registro.
         const trimmedName = nome.trim();
         const repeated = data.categorias.some((item) => !sameId(item.id, editingId) && normalize(item.nome) === normalize(trimmedName));
 
@@ -38,6 +40,7 @@ export function CategoriesPage({ data, addWithId, updateById, removeById, notify
     }
 
     function editCategory(category: any) {
+        // Preenche o formulario com os dados selecionados na tabela.
         setEditingId(category.id);
         setNome(category.nome);
         setDescricao(category.descricao);

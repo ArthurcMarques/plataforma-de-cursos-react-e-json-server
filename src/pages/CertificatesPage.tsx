@@ -1,3 +1,4 @@
+// Pagina de certificados: gera certificados para alunos com progresso.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, normalize, sameId, todayISO } from "../utils";
@@ -23,6 +24,7 @@ export function CertificatesPage({ data, addDirect, updateById, removeById, noti
     }
 
     function hasCompletedProgress(userId: number, courseId: number) {
+        // Confere se existe pelo menos uma aula concluida no curso.
         const courseModules = data.modulos.filter((module) => sameId(module.idCurso, courseId));
         const lessonIds = data.aulas.filter((lesson) => courseModules.some((module) => sameId(module.id, lesson.idModulo))).map((lesson) => lesson.id);
         return data.progressoAulas.some((progress) => {
@@ -32,6 +34,7 @@ export function CertificatesPage({ data, addDirect, updateById, removeById, noti
 
     async function saveCertificate(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Editar certificado nao exige verificar progresso novamente.
         const userId = Number(idUsuario);
         const courseId = Number(idCurso);
         const repeated = data.certificados.some((item) => {

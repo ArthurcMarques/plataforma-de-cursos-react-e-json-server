@@ -1,3 +1,5 @@
+// Rotas da aplicacao.
+// Cada path aponta para uma pagina especifica.
 import { Navigate, Route, Routes } from "react-router-dom";
 import { CategoriesPage } from "../pages/CategoriesPage";
 import { CoursesPage } from "../pages/CoursesPage";

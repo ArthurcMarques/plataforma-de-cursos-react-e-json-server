@@ -1,3 +1,4 @@
+// Pagina de modulos: organiza modulos dentro de cada curso.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, sameId } from "../utils";
@@ -20,6 +21,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
 
     async function saveModule(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Nao deixa repetir a mesma ordem dentro do mesmo curso.
         const courseId = Number(idCurso);
         const order = Number(ordem);
         const repeated = data.modulos.some((item) => {
@@ -45,6 +47,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
     }
 
     function editModule(module: any) {
+        // Carrega os dados do modulo no formulario.
         setEditingId(module.id);
         setIdCurso(String(module.idCurso));
         setTitulo(module.titulo);

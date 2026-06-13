@@ -1,3 +1,4 @@
+// Funcoes pequenas usadas em varias partes do sistema.
 import type { RecordId } from "./models/types";
 
 // Retorna a data atual no formato usado pelos inputs date.

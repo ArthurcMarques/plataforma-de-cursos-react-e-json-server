@@ -1,3 +1,4 @@
+// Configuracao do Vite para rodar React.
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 

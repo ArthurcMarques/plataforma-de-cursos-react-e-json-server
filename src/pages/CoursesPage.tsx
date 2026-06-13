@@ -1,3 +1,4 @@
+// Pagina de cursos: cadastra cursos e relaciona categoria e instrutor.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import type { Curso } from "../models/types";
@@ -28,6 +29,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
 
     async function saveCourse(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Curso depende de categoria e instrutor ja cadastrados.
 
         if (!data.categorias.length || !instructors.length) {
             notify("Cadastre ao menos uma categoria e um instrutor antes do curso.", "danger");
@@ -56,6 +58,7 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
     }
 
     function editCourse(course: Curso) {
+        // Coloca o curso escolhido no formulario para alteracao.
         setEditingId(course.id);
         setTitulo(course.titulo);
         setDescricao(course.descricao);

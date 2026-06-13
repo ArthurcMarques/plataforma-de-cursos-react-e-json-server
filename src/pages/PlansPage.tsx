@@ -1,3 +1,4 @@
+// Pagina de planos: cadastra planos financeiros.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { normalize, sameId } from "../utils";
@@ -21,6 +22,7 @@ export function PlansPage({ data, addWithId, updateById, removeById, notify, nav
 
     async function savePlan(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Nome do plano nao pode repetir.
         const repeated = data.planos.some((item) => !sameId(item.id, editingId) && normalize(item.nome) === normalize(nome));
 
         if (repeated) {

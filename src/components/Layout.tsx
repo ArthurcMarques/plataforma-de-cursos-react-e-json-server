@@ -1,3 +1,4 @@
+// Layout visual da aplicacao com navbar e area de conteudo.
 import type { ReactNode } from "react";
 import type { SectionItem } from "../router/routes";
 
@@ -8,8 +9,8 @@ interface LayoutProps {
     children: ReactNode;
 }
 
-// Layout principal com menu de navegacao e area de conteudo.
 export function Layout({ sections, currentPath, onNavigate, children }: LayoutProps) {
+    // Agrupa as secoes para montar os dropdowns do menu.
     const grouped = sections.reduce<Record<string, SectionItem[]>>((groups, section) => {
         if (section.group === "principal") {
             return groups;

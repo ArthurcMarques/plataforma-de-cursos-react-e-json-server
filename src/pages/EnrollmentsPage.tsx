@@ -1,3 +1,4 @@
+// Pagina de matriculas: liga usuarios a cursos.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, sameId, todayISO } from "../utils";
@@ -24,6 +25,7 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
 
     async function saveEnrollment(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Um usuario nao deve se matricular duas vezes no mesmo curso.
         const userId = Number(idUsuario);
         const courseId = Number(idCurso);
         const repeated = data.matriculas.some((item) => {

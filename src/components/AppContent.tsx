@@ -1,3 +1,4 @@
+// Decide o que aparece na area principal: carregamento, erro ou rotas.
 import { useAppData } from "../hooks/useAppData";
 import type { PageProps } from "../pages/pageTypes";
 import { AppRoutes } from "../router/AppRoutes";
@@ -9,6 +10,7 @@ interface AppContentProps {
 export function AppContent({ navigateToSection }: AppContentProps) {
     const appData = useAppData();
 
+    // Props que todas as paginas recebem para acessar dados e funcoes de CRUD.
     const pageProps: PageProps = {
         data: appData.data,
         addWithId: appData.addWithId,

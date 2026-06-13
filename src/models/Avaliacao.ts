@@ -1,3 +1,4 @@
+// Model de avaliacao feita por usuario em um curso.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

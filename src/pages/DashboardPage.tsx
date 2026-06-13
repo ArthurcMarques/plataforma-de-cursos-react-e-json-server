@@ -1,7 +1,9 @@
+// Dashboard inicial com resumo e atalhos para telas principais.
 import type { PageProps } from "./pageTypes";
 
 // Pagina inicial com atalhos para as principais secoes.
 export function DashboardPage({ data, navigate }: PageProps) {
+    // Cards calculados a partir dos dados carregados do JSON Server.
     const cards = [
         { title: "Cursos", value: data.cursos.length, section: "cursos" },
         { title: "Usuários", value: data.usuarios.length, section: "usuarios" },

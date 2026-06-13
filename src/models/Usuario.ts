@@ -1,3 +1,4 @@
+// Model de usuario, usado para alunos e instrutores.
 import { z } from "zod";
 import { idSchema, textSchema, type RecordId } from "./common";
 

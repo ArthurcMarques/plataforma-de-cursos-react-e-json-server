@@ -1,3 +1,5 @@
+// Camada de acesso ao JSON Server.
+// As paginas chamam estas funcoes indiretamente pelo hook useAppData.
 import type { AppData, CollectionName, RecordId } from "../models/types";
 import { modelSchemas } from "../models/types";
 
@@ -84,6 +86,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 function validateCollection(name: CollectionName, records: AnyRecord[]) {
+    // Garante que cada item recebido respeita o schema do model.
     return records.map((record) => validateRecord(name, record));
 }
 

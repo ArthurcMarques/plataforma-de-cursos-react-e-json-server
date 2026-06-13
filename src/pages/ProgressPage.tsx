@@ -1,3 +1,4 @@
+// Pagina de progresso: marca aulas concluidas por aluno.
 import { useState } from "react";
 import type { Curso, RecordId } from "../models/types";
 import { nameById, normalize, sameId, todayISO } from "../utils";
@@ -10,12 +11,14 @@ export function ProgressPage({ data, addDirect, removeDirect, notify }: PageProp
     const selectedUser = data.usuarios.find((item) => sameId(item.id, idUsuario));
 
     function isLessonDone(idAula: RecordId) {
+        // Verifica se a aula ja foi marcada como concluida para o aluno.
         return data.progressoAulas.some((item) => {
             return sameId(item.idUsuario, idUsuario) && sameId(item.idAula, idAula) && normalize(item.status).includes("concl");
         });
     }
 
     async function toggleLesson(idAula: RecordId, checked: boolean) {
+        // Cria ou remove o progresso conforme o checkbox.
         if (!idUsuario) {
             notify("Selecione um aluno antes de marcar aulas.", "danger");
             return;

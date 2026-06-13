@@ -1,3 +1,4 @@
+// Model que liga trilhas e cursos.
 import { z } from "zod";
 import { idSchema, numberSchema, type RecordId } from "./common";
 

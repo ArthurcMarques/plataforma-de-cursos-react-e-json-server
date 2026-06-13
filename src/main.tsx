@@ -1,3 +1,5 @@
+// Entrada da aplicacao React.
+// Aqui o React e ligado ao HTML e o BrowserRouter habilita as rotas.
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";

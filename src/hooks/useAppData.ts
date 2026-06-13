@@ -1,3 +1,4 @@
+// Hook que concentra dados, loading, alertas e operacoes de CRUD.
 import { useEffect, useState } from "react";
 import type { AppData, CollectionName, RecordId } from "../models/types";
 import { createRecord, deleteRecord, emptyAppData, fetchAppData, updateRecord } from "../services/api";
@@ -6,6 +7,7 @@ type AlertState = { message: string; type: "success" | "warning" | "danger" } | 
 type WithId = { id: RecordId };
 
 export function useAppData() {
+    // Estado compartilhado por todas as paginas.
     const [data, setData] = useState<AppData>(emptyAppData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -15,6 +17,7 @@ export function useAppData() {
         void refreshData();
     }, []);
 
+    // Carrega todas as colecoes do JSON Server.
     async function refreshData() {
         setLoading(true);
         try {
@@ -62,6 +65,7 @@ export function useAppData() {
     }
 
     async function removeDirect(name: CollectionName, id: RecordId) {
+        // Remove da tela primeiro e restaura se o servidor falhar.
         const previousList = data[name] as any[];
         const updated = (previousList as WithId[]).filter((item) => Number(item.id) !== Number(id));
         setData((current) => ({ ...current, [name]: updated }));

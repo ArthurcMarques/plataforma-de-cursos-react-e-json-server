@@ -1,3 +1,4 @@
+// Pagina de usuarios: cadastra alunos e instrutores.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import type { Usuario } from "../models/types";
@@ -24,6 +25,7 @@ export function UsersPage({ data, addWithId, updateById, removeById, notify, nav
 
     async function saveUser(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // E-mail e usado como campo unico para evitar usuarios duplicados.
         const normalizedEmail = normalize(email);
         const repeated = data.usuarios.some((item) => !sameId(item.id, editingId) && normalize(item.email) === normalizedEmail);
 
@@ -46,6 +48,7 @@ export function UsersPage({ data, addWithId, updateById, removeById, notify, nav
     }
 
     function editUser(user: Usuario) {
+        // Preenche o formulario para editar o usuario.
         setEditingId(user.id);
         setNomeCompleto(user.nomeCompleto);
         setEmail(user.email);

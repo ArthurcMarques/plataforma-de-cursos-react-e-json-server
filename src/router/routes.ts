@@ -1,3 +1,4 @@
+// Lista usada para montar o menu de navegacao.
 export interface SectionItem {
     id: string;
     name: string;

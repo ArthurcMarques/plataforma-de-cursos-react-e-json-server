@@ -1,3 +1,4 @@
+// Model de pagamento de uma assinatura.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

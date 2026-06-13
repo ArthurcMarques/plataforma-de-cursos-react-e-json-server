@@ -1,3 +1,4 @@
+// Model de plano financeiro.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

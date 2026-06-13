@@ -1,3 +1,4 @@
+// Model de modulo pertencente a um curso.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

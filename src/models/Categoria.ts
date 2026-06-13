@@ -1,3 +1,4 @@
+// Model de categoria dos cursos.
 import { z } from "zod";
 import { idSchema, textSchema, type RecordId } from "./common";
 

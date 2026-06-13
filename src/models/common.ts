@@ -1,3 +1,4 @@
+// Tipos e schemas reutilizados pelos models.
 import { z } from "zod";
 
 export type RecordId = number | string;

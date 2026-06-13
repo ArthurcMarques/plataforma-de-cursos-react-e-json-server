@@ -1,3 +1,4 @@
+// Pagina de assinaturas: vincula usuarios a planos.
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { nameById, todayISO } from "../utils";
@@ -26,6 +27,7 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, nav
 
     async function saveSubscription(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        // Datas e ids sao convertidos antes de salvar no JSON Server.
         const subscription = { idUsuario: Number(idUsuario), idPlano: Number(idPlano), dataInicio, dataFim };
 
         if (editingId !== null) {

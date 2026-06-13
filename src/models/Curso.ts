@@ -1,3 +1,4 @@
+// Model de curso da plataforma.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 

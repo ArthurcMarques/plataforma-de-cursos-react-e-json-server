@@ -1,3 +1,4 @@
+// Model de progresso de uma aula para um usuario.
 import { z } from "zod";
 import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 
