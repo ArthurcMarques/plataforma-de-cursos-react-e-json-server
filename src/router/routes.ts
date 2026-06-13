@@ -22,13 +22,3 @@ export const sections: SectionItem[] = [
     { id: "assinaturas", name: "Assinaturas", path: "/assinaturas", group: "Financeiro" },
     { id: "pagamentos", name: "Pagamentos", path: "/pagamentos", group: "Financeiro" }
 ];
-
-export function getSectionByPath(pathname: string) {
-    const found = sections.find((section) => section.path === pathname);
-    return found ? found.id : "dashboard";
-}
-
-export function getPathBySection(sectionId: string) {
-    const found = sections.find((section) => section.id === sectionId);
-    return found ? found.path : "/";
-}
