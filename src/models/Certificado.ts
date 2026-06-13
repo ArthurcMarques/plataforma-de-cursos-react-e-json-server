@@ -5,18 +5,18 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Certificado {
     static schema = z.object({
         id: idSchema,
-        idUsuario: numberSchema,
-        idCurso: numberSchema,
-        idTrilha: z.union([numberSchema, z.null()]),
+        idUsuario: idSchema,
+        idCurso: idSchema,
+        idTrilha: z.union([idSchema, z.null()]),
         codigoVerificacao: textSchema,
         dataEmissao: textSchema
     });
 
     constructor(
         public id: RecordId,
-        public idUsuario: number,
-        public idCurso: number,
-        public idTrilha: number | null,
+        public idUsuario: RecordId,
+        public idCurso: RecordId,
+        public idTrilha: RecordId | null,
         public codigoVerificacao: string,
         public dataEmissao: string
     ) { }

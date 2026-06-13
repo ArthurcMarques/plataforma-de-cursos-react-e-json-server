@@ -27,8 +27,8 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
     async function saveEnrollment(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Um usuario nao deve se matricular duas vezes no mesmo curso.
-        const userId = Number(idUsuario);
-        const courseId = Number(idCurso);
+        const userId = idUsuario;
+        const courseId = idCurso;
         const repeated = data.matriculas.some((item) => {
             return !sameId(item.id, editingId) && sameId(item.idUsuario, userId) && sameId(item.idCurso, courseId);
         });

@@ -7,13 +7,13 @@ export class Trilha {
         id: idSchema,
         titulo: textSchema,
         descricao: textSchema,
-        idCategoria: numberSchema
+        idCategoria: idSchema
     });
 
     constructor(
         public id: RecordId,
         public titulo: string,
         public descricao: string,
-        public idCategoria: number
+        public idCategoria: RecordId
     ) { }
 }

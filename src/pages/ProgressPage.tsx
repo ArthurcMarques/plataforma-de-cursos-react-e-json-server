@@ -8,7 +8,7 @@ import { SelectInput } from "./shared";
 
 export function ProgressPage({ data, addDirect, removeDirect, notify }: PageProps) {
     const [selectedUserId, setSelectedUserId] = useState("");
-    const idUsuario = Number(selectedUserId);
+    const idUsuario = selectedUserId;
     const selectedUser = data.usuarios.find((item) => sameId(item.id, idUsuario));
 
     function isLessonDone(idAula: RecordId) {
@@ -32,7 +32,7 @@ export function ProgressPage({ data, addDirect, removeDirect, notify }: PageProp
         }
 
         if (checked && !current) {
-            await addDirect("progressoAulas", { idUsuario, idAula: Number(idAula), status: "Concluído", dataConclusao: todayISO() });
+            await addDirect("progressoAulas", { idUsuario, idAula, status: "Concluído", dataConclusao: todayISO() });
         }
     }
 

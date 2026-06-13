@@ -5,16 +5,16 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Assinatura {
     static schema = z.object({
         id: idSchema,
-        idUsuario: numberSchema,
-        idPlano: numberSchema,
+        idUsuario: idSchema,
+        idPlano: idSchema,
         dataInicio: textSchema,
         dataFim: textSchema
     });
 
     constructor(
         public id: RecordId,
-        public idUsuario: number,
-        public idPlano: number,
+        public idUsuario: RecordId,
+        public idPlano: RecordId,
         public dataInicio: string,
         public dataFim: string
     ) { }

@@ -5,16 +5,16 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Matricula {
     static schema = z.object({
         id: idSchema,
-        idUsuario: numberSchema,
-        idCurso: numberSchema,
+        idUsuario: idSchema,
+        idCurso: idSchema,
         dataMatricula: textSchema,
         dataConclusao: z.union([textSchema, z.null()])
     });
 
     constructor(
         public id: RecordId,
-        public idUsuario: number,
-        public idCurso: number,
+        public idUsuario: RecordId,
+        public idCurso: RecordId,
         public dataMatricula: string,
         public dataConclusao: string | null
     ) { }

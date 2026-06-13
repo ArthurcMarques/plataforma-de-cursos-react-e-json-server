@@ -38,7 +38,7 @@ export function PaymentsPage({ data, addWithId, updateById, removeById, notify }
         }
 
         const payment = {
-            idAssinatura: Number(idAssinatura),
+            idAssinatura,
             valorPago: Number(valorPago),
             dataPagamento,
             metodoPagamento: metodoPagamento as Pagamento["metodoPagamento"],

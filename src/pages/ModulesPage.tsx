@@ -23,7 +23,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
     async function saveModule(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Nao deixa repetir a mesma ordem dentro do mesmo curso.
-        const courseId = Number(idCurso);
+        const courseId = idCurso;
         const order = Number(ordem);
         const repeated = data.modulos.some((item) => {
             return !sameId(item.id, editingId) && sameId(item.idCurso, courseId) && Number(item.ordem) === order;

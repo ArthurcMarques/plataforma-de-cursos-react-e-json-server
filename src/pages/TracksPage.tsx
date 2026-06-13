@@ -28,7 +28,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
     async function saveTrack(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Salva uma trilha nova ou atualiza a trilha em edicao.
-        const track = { titulo: titulo.trim(), descricao: descricao.trim(), idCategoria: Number(idCategoria) };
+        const track = { titulo: titulo.trim(), descricao: descricao.trim(), idCategoria };
 
         if (editingId !== null) {
             const updated = await updateById("trilhas", editingId, track);
@@ -53,8 +53,8 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
     async function submitLink(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Evita vincular o mesmo curso duas vezes na mesma trilha.
-        const idTrilha = Number(linkForm.idTrilha);
-        const idCurso = Number(linkForm.idCurso);
+        const idTrilha = linkForm.idTrilha;
+        const idCurso = linkForm.idCurso;
         if (data.trilhasCursos.some((item) => sameId(item.idTrilha, idTrilha) && sameId(item.idCurso, idCurso))) {
             notify("Esse curso ja esta vinculado a essa trilha.", "danger");
             return;

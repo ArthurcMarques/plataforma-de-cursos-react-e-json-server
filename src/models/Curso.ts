@@ -8,8 +8,8 @@ export class Curso {
         titulo: textSchema,
         descricao: textSchema,
         nivel: z.enum(["Iniciante", "Intermediário", "Avançado"]),
-        idCategoria: numberSchema,
-        idInstrutor: numberSchema,
+        idCategoria: idSchema,
+        idInstrutor: idSchema,
         dataPublicacao: textSchema,
         totalAulas: numberSchema,
         totalHoras: numberSchema
@@ -20,8 +20,8 @@ export class Curso {
         public titulo: string,
         public descricao: string,
         public nivel: "Iniciante" | "Intermediário" | "Avançado",
-        public idCategoria: number,
-        public idInstrutor: number,
+        public idCategoria: RecordId,
+        public idInstrutor: RecordId,
         public dataPublicacao: string,
         public totalAulas: number,
         public totalHoras: number

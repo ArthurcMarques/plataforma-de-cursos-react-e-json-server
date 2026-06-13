@@ -13,7 +13,7 @@ export function normalize(value: unknown) {
 
 // Compara ids mesmo quando o JSON Server devolve strings.
 export function sameId(left: unknown, right: unknown) {
-    return Number(left) === Number(right);
+    return String(left ?? "") === String(right ?? "");
 }
 
 // Procura um nome/campo pelo id relacionado.

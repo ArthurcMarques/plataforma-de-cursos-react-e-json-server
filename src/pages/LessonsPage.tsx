@@ -37,7 +37,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
     async function saveLesson(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Nao permite duas aulas com a mesma ordem no mesmo modulo.
-        const moduleId = Number(idModulo);
+        const moduleId = idModulo;
         const order = Number(ordem);
         const repeated = data.aulas.some((item) => {
             return !sameId(item.id, editingId) && sameId(item.idModulo, moduleId) && Number(item.ordem) === order;

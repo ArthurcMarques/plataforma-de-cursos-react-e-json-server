@@ -24,7 +24,7 @@ export function CertificatesPage({ data, addDirect, updateById, removeById, noti
         setEditingId(null);
     }
 
-    function hasCompletedProgress(userId: number, courseId: number) {
+    function hasCompletedProgress(userId: string, courseId: string) {
         // Confere se existe pelo menos uma aula concluida no curso.
         const courseModules = data.modulos.filter((module) => sameId(module.idCurso, courseId));
         const lessonIds = data.aulas.filter((lesson) => courseModules.some((module) => sameId(module.id, lesson.idModulo))).map((lesson) => lesson.id);
@@ -36,8 +36,8 @@ export function CertificatesPage({ data, addDirect, updateById, removeById, noti
     async function saveCertificate(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         // Editar certificado nao exige verificar progresso novamente.
-        const userId = Number(idUsuario);
-        const courseId = Number(idCurso);
+        const userId = idUsuario;
+        const courseId = idCurso;
         const repeated = data.certificados.some((item) => {
             return !sameId(item.id, editingId) && sameId(item.idUsuario, userId) && sameId(item.idCurso, courseId);
         });

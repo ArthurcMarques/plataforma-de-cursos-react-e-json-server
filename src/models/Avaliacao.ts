@@ -5,8 +5,8 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Avaliacao {
     static schema = z.object({
         id: idSchema,
-        idUsuario: numberSchema,
-        idCurso: numberSchema,
+        idUsuario: idSchema,
+        idCurso: idSchema,
         nota: numberSchema,
         comentario: textSchema,
         dataAvaliacao: textSchema
@@ -14,8 +14,8 @@ export class Avaliacao {
 
     constructor(
         public id: RecordId,
-        public idUsuario: number,
-        public idCurso: number,
+        public idUsuario: RecordId,
+        public idCurso: RecordId,
         public nota: number,
         public comentario: string,
         public dataAvaliacao: string

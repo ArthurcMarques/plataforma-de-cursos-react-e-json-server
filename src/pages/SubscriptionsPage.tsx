@@ -28,8 +28,8 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, nav
 
     async function saveSubscription(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        // Datas e ids sao convertidos antes de salvar no JSON Server.
-        const subscription = { idUsuario: Number(idUsuario), idPlano: Number(idPlano), dataInicio, dataFim };
+        // Datas e ids selecionados sao enviados para o JSON Server.
+        const subscription = { idUsuario, idPlano, dataInicio, dataFim };
 
         if (editingId !== null) {
             const updated = await updateById("assinaturas", editingId, subscription);

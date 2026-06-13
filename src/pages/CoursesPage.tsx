@@ -41,8 +41,8 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
             titulo: titulo.trim(),
             descricao: descricao.trim(),
             nivel: nivel as Curso["nivel"],
-            idCategoria: Number(idCategoria),
-            idInstrutor: Number(idInstrutor),
+            idCategoria,
+            idInstrutor,
             dataPublicacao
         };
 

@@ -32,8 +32,8 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, navigate 
         event.preventDefault();
         // Monta a avaliacao usando os ids selecionados nos selects.
         const review = {
-            idUsuario: Number(idUsuario),
-            idCurso: Number(idCurso),
+            idUsuario,
+            idCurso,
             nota: Number(nota),
             comentario: comentario.trim(),
             dataAvaliacao

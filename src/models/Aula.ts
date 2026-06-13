@@ -5,7 +5,7 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Aula {
     static schema = z.object({
         id: idSchema,
-        idModulo: numberSchema,
+        idModulo: idSchema,
         titulo: textSchema,
         tipoConteudo: z.enum(["Vídeo", "Texto", "Quiz"]),
         urlConteudo: textSchema,
@@ -15,7 +15,7 @@ export class Aula {
 
     constructor(
         public id: RecordId,
-        public idModulo: number,
+        public idModulo: RecordId,
         public titulo: string,
         public tipoConteudo: "Vídeo" | "Texto" | "Quiz",
         public urlConteudo: string,

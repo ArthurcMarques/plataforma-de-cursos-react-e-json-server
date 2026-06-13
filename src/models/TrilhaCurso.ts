@@ -5,15 +5,15 @@ import { idSchema, numberSchema, type RecordId } from "./common";
 export class TrilhaCurso {
     static schema = z.object({
         id: idSchema,
-        idTrilha: numberSchema,
-        idCurso: numberSchema,
+        idTrilha: idSchema,
+        idCurso: idSchema,
         ordem: numberSchema
     });
 
     constructor(
         public id: RecordId,
-        public idTrilha: number,
-        public idCurso: number,
+        public idTrilha: RecordId,
+        public idCurso: RecordId,
         public ordem: number
     ) { }
 }

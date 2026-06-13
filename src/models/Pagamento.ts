@@ -5,7 +5,7 @@ import { idSchema, numberSchema, textSchema, type RecordId } from "./common";
 export class Pagamento {
     static schema = z.object({
         id: idSchema,
-        idAssinatura: numberSchema,
+        idAssinatura: idSchema,
         valorPago: numberSchema,
         dataPagamento: textSchema,
         metodoPagamento: z.enum(["Cartão", "Pix", "Boleto"]),
@@ -14,7 +14,7 @@ export class Pagamento {
 
     constructor(
         public id: RecordId,
-        public idAssinatura: number,
+        public idAssinatura: RecordId,
         public valorPago: number,
         public dataPagamento: string,
         public metodoPagamento: "Cartão" | "Pix" | "Boleto",
