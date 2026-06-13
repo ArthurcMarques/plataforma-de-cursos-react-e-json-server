@@ -1,9 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { CategoriesPage, CoursesPage, LessonsPage, ModulesPage, TracksPage } from "../pages/AcademicPages";
+import { CategoriesPage } from "../pages/CategoriesPage";
+import { CoursesPage } from "../pages/CoursesPage";
 import { DashboardPage } from "../pages/DashboardPage";
-import { PaymentsPage, PlansPage, SubscriptionsPage } from "../pages/FinancePages";
+import { EnrollmentsPage } from "../pages/EnrollmentsPage";
+import { LessonsPage } from "../pages/LessonsPage";
+import { ModulesPage } from "../pages/ModulesPage";
 import type { PageProps } from "../pages/pageTypes";
-import { CertificatesPage, EnrollmentsPage, ProgressPage, ReviewsPage, UsersPage } from "../pages/UserPages";
+import { PaymentsPage } from "../pages/PaymentsPage";
+import { PlansPage } from "../pages/PlansPage";
+import { ProgressPage } from "../pages/ProgressPage";
+import { ReviewsPage } from "../pages/ReviewsPage";
+import { SubscriptionsPage } from "../pages/SubscriptionsPage";
+import { TracksPage } from "../pages/TracksPage";
+import { UsersPage } from "../pages/UsersPage";
+import { CertificatesPage } from "../pages/CertificatesPage";
 
 export function AppRoutes(props: PageProps) {
     return (

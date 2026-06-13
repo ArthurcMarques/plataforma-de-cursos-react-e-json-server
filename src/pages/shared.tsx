@@ -35,7 +35,7 @@ export function ActionButton({ children, danger = false, onClick }: { children: 
     return <button className={`btn btn-sm btn-${danger ? "outline-danger" : "outline-secondary"}`} type="button" onClick={onClick}>{children}</button>;
 }
 
-// Select reutilizado em telas que nao usam o CrudPage completo.
+// Select simples reutilizado em formularios menores.
 export function SelectInput({ label, value, options, required, onChange }: {
     label: string;
     value: string;
