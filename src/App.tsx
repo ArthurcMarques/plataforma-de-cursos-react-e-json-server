@@ -1,13 +1,10 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import type { AppData, CollectionName, RecordId } from "./models/types";
-import { CategoriesPage, CoursesPage, LessonsPage, ModulesPage, TracksPage } from "./pages/AcademicPages";
-import { DashboardPage } from "./pages/DashboardPage";
-import { PaymentsPage, PlansPage, SubscriptionsPage } from "./pages/FinancePages";
 import type { PageProps } from "./pages/pageTypes";
-import { getPathBySection, getSectionByPath, sections } from "./pages/routes";
-import { CertificatesPage, EnrollmentsPage, ProgressPage, ReviewsPage, UsersPage } from "./pages/UserPages";
+import { AppRoutes } from "./router/AppRoutes";
+import { getPathBySection, getSectionByPath, sections } from "./router/routes";
 import { createRecord, deleteRecord, emptyAppData, fetchAppData, updateRecord } from "./services/api";
 
 type AlertState = { message: string; type: "success" | "warning" | "danger" } | null;
@@ -128,23 +125,7 @@ export function App() {
                         <button className="btn btn-primary" type="button" onClick={() => void refreshData()}>Tentar novamente</button>
                     </section>
                 ) : (
-                    <Routes>
-                        <Route path="/" element={<DashboardPage {...props} />} />
-                        <Route path="/categorias" element={<CategoriesPage {...props} />} />
-                        <Route path="/cursos" element={<CoursesPage {...props} />} />
-                        <Route path="/modulos" element={<ModulesPage {...props} />} />
-                        <Route path="/aulas" element={<LessonsPage {...props} />} />
-                        <Route path="/trilhas" element={<TracksPage {...props} />} />
-                        <Route path="/usuarios" element={<UsersPage {...props} />} />
-                        <Route path="/matriculas" element={<EnrollmentsPage {...props} />} />
-                        <Route path="/progresso" element={<ProgressPage {...props} />} />
-                        <Route path="/avaliacoes" element={<ReviewsPage {...props} />} />
-                        <Route path="/certificados" element={<CertificatesPage {...props} />} />
-                        <Route path="/planos" element={<PlansPage {...props} />} />
-                        <Route path="/assinaturas" element={<SubscriptionsPage {...props} />} />
-                        <Route path="/pagamentos" element={<PaymentsPage {...props} />} />
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                    <AppRoutes {...props} />
                 )}
             </Layout>
         </>

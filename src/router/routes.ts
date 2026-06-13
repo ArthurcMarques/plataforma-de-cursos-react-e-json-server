@@ -1,4 +1,9 @@
-import type { SectionItem } from "../components/Layout";
+export interface SectionItem {
+    id: string;
+    name: string;
+    path: string;
+    group: "principal" | "Acadêmico" | "Usuário" | "Financeiro";
+}
 
 // Cada item define o menu e tambem a rota da pagina.
 export const sections: SectionItem[] = [
