@@ -24,6 +24,7 @@ export interface ColumnConfig {
 }
 
 type FormValues = Record<string, string>;
+type RowId = string | number | null;
 
 interface CrudPageProps {
     title: string;
@@ -40,7 +41,6 @@ interface CrudPageProps {
     getRowKey?: (row: any) => string | number;
 }
 
-// Componente generico para telas de cadastro, edicao e listagem.
 export function CrudPage({
     title,
     description,
@@ -57,6 +57,7 @@ export function CrudPage({
 }: CrudPageProps) {
     const [form, setForm] = useState<FormValues>(initialValues);
     const [editingRow, setEditingRow] = useState<any | null>(null);
+    const [editingId, setEditingId] = useState<RowId>(null);
 
     function change(name: string, value: string) {
         setForm((current) => ({ ...current, [name]: value }));
@@ -64,7 +65,16 @@ export function CrudPage({
 
     async function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const saved = editingRow && onUpdate ? await onUpdate(editingRow, form) : await onSubmit(form);
+
+        if (editingId !== null && editingRow && onUpdate) {
+            const updated = await onUpdate(editingRow, form);
+            if (updated !== false) {
+                resetForm();
+            }
+            return;
+        }
+
+        const saved = await onSubmit(form);
         if (saved !== false) {
             resetForm();
         }
@@ -76,17 +86,20 @@ export function CrudPage({
         }
 
         setEditingRow(row);
+        setEditingId(row.id);
         setForm(getEditValues(row));
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function resetForm() {
         setEditingRow(null);
+        setEditingId(null);
         setForm(initialValues);
     }
 
     function renderRowActions(row: any) {
         const customActions = renderActions ? renderActions(row) : null;
+
         if (!getEditValues || !onUpdate) {
             return customActions;
         }
@@ -106,14 +119,14 @@ export function CrudPage({
                 <p className="text-muted mb-0">{description}</p>
             </section>
             <section className="panel">
-                {editingRow && <p className="edit-banner">Editando registro. Salve as alterações ou limpe o formulário para cancelar.</p>}
+                {editingId !== null && <p className="edit-banner">Editando registro. Salve as alteracoes ou cancele para voltar ao cadastro.</p>}
                 <form className="row g-3" onSubmit={submit}>
                     {fields.map((field) => (
                         <FormField field={field} value={form[field.name] ?? ""} onChange={change} key={field.name} />
                     ))}
                     <div className="col-12 d-flex gap-2">
-                        <button className="btn btn-primary" type="submit">{editingRow ? "Salvar alterações" : "Salvar"}</button>
-                        <button className="btn btn-outline-secondary" type="button" onClick={resetForm}>{editingRow ? "Cancelar" : "Limpar"}</button>
+                        <button className="btn btn-primary" type="submit">{editingId !== null ? "Salvar alteracoes" : "Salvar"}</button>
+                        <button className="btn btn-outline-secondary" type="button" onClick={resetForm}>{editingId !== null ? "Cancelar" : "Limpar"}</button>
                     </div>
                 </form>
             </section>
@@ -169,7 +182,7 @@ function DataTable({ columns, rows, emptyText, renderActions, getRowKey }: {
                     <thead>
                         <tr>
                             {columns.map((column) => <th key={column.key}>{column.label}</th>)}
-                            {renderActions && <th className="text-center">Ações</th>}
+                            {renderActions && <th className="text-center">Acoes</th>}
                         </tr>
                     </thead>
                     <tbody>
