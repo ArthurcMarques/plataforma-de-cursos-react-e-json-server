@@ -3,7 +3,7 @@ import { CrudPage } from "../components/CrudPage";
 import type { Curso, RecordId, Usuario } from "../models/types";
 import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
-import { ActionButton, quickCreateCourse, quickCreateUser, SelectInput } from "./shared";
+import { ActionButton, SelectInput } from "./shared";
 
 // Paginas do modulo de usuario: usuarios, matriculas, progresso, avaliacoes e certificados.
 export function UsersPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
@@ -71,8 +71,8 @@ export function EnrollmentsPage({ data, addWithId, updateById, removeById, notif
             description="Simule a matrícula de usuários em cursos."
             initialValues={{ idUsuario: "", idCurso: "", dataMatricula: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
                 { name: "dataMatricula", label: "Data", type: "date", required: true }
             ]}
             columns={[
@@ -166,8 +166,6 @@ export function ProgressPage({ data, addWithId, addDirect, removeDirect, notify 
                         value={selectedUserId}
                         required
                         options={data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto }))}
-                        actionLabel="+ Aluno"
-                        onAction={() => quickCreateUser({ data, addWithId, notify })}
                         onChange={setSelectedUserId}
                     />
                     <div className="col-12 col-md-6">
@@ -239,8 +237,8 @@ export function ReviewsPage({ data, addWithId, updateById, removeById, notify, n
             description="Registre avaliações de usuários para os cursos."
             initialValues={{ idUsuario: "", idCurso: "", nota: "", comentario: "", dataAvaliacao: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
                 { name: "nota", label: "Nota", type: "select", required: true, options: [1, 2, 3, 4, 5].map((item) => ({ value: item, label: String(item) })) },
                 { name: "dataAvaliacao", label: "Data", type: "date", required: true },
                 { name: "comentario", label: "Comentário", type: "textarea", col: "col-12" }
@@ -300,8 +298,8 @@ export function CertificatesPage({ data, addWithId, addDirect, updateById, remov
             description="Gere certificados para usuários com progresso concluído no curso."
             initialValues={{ idUsuario: "", idCurso: "", dataEmissao: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
                 { name: "dataEmissao", label: "Data de emissão", type: "date", required: true }
             ]}
             columns={[

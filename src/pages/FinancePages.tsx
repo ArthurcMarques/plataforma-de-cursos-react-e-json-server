@@ -2,7 +2,7 @@ import { CrudPage } from "../components/CrudPage";
 import type { Pagamento } from "../models/types";
 import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
-import { ActionButton, money, quickCreatePlan, quickCreateSubscription, quickCreateUser, subscriptionDescription } from "./shared";
+import { ActionButton, money, subscriptionDescription } from "./shared";
 
 // Paginas do modulo financeiro: planos, assinaturas e pagamentos.
 export function PlansPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
@@ -66,8 +66,8 @@ export function SubscriptionsPage({ data, addWithId, updateById, removeById, not
             description="Vincule usuários a planos por período."
             initialValues={{ idUsuario: "", idPlano: "", dataInicio: todayISO(), dataFim: todayISO() }}
             fields={[
-                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Usuário", onAction: () => quickCreateUser({ data, addWithId, notify }) },
-                { name: "idPlano", label: "Plano", type: "select", required: true, options: data.planos.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Plano", onAction: () => quickCreatePlan({ data, addWithId, notify }) },
+                { name: "idUsuario", label: "Usuário", type: "select", required: true, options: data.usuarios.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
+                { name: "idPlano", label: "Plano", type: "select", required: true, options: data.planos.map((item) => ({ value: item.id, label: item.nome })) },
                 { name: "dataInicio", label: "Início", type: "date", required: true },
                 { name: "dataFim", label: "Fim", type: "date", required: true }
             ]}
@@ -112,7 +112,7 @@ export function PaymentsPage({ data, addWithId, updateById, removeById, notify }
             description="Registre pagamentos simulados para assinaturas."
             initialValues={{ idAssinatura: "", valorPago: "", dataPagamento: todayISO(), metodoPagamento: "", idTransacaoGateway: "" }}
             fields={[
-                { name: "idAssinatura", label: "Assinatura", type: "select", required: true, options: data.assinaturas.map((item) => ({ value: item.id, label: subscriptionDescription(data, item.id) })), actionLabel: "+ Assinatura", onAction: () => quickCreateSubscription({ data, addWithId, notify }) },
+                { name: "idAssinatura", label: "Assinatura", type: "select", required: true, options: data.assinaturas.map((item) => ({ value: item.id, label: subscriptionDescription(data, item.id) })) },
                 { name: "valorPago", label: "Valor pago", type: "number", min: 0, step: "0.01", required: true },
                 { name: "dataPagamento", label: "Data", type: "date", required: true },
                 { name: "metodoPagamento", label: "Método", type: "select", required: true, options: ["Cartão", "Pix", "Boleto"].map((item) => ({ value: item, label: item })) },

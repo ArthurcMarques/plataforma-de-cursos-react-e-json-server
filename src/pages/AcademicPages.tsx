@@ -4,7 +4,7 @@ import { CrudPage } from "../components/CrudPage";
 import type { Aula, Curso } from "../models/types";
 import { nameById, normalize, sameId, todayISO } from "../utils";
 import type { PageProps } from "./pageTypes";
-import { ActionButton, courseSummary, quickCreateCategory, quickCreateCourse, quickCreateLesson, quickCreateModule, quickCreateTrack, quickCreateUser, SelectInput, SimpleTable, TextInput } from "./shared";
+import { ActionButton, courseSummary, SelectInput, SimpleTable, TextInput } from "./shared";
 
 // Paginas do modulo academico: categorias, cursos, modulos, aulas e trilhas.
 export function CategoriesPage({ data, addWithId, updateById, removeById, notify, navigate }: PageProps) {
@@ -63,8 +63,8 @@ export function CoursesPage({ data, addWithId, updateById, removeById, notify, n
             fields={[
                 { name: "titulo", label: "Título", required: true },
                 { name: "nivel", label: "Nível", type: "select", required: true, options: ["Iniciante", "Intermediário", "Avançado"].map((level) => ({ value: level, label: level })) },
-                { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Categoria", onAction: () => quickCreateCategory({ data, addWithId, notify }) },
-                { name: "idInstrutor", label: "Instrutor", type: "select", required: true, options: instructors.map((item) => ({ value: item.id, label: item.nomeCompleto })), actionLabel: "+ Instrutor", onAction: () => quickCreateUser({ data, addWithId, notify }, "Instrutor") },
+                { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })) },
+                { name: "idInstrutor", label: "Instrutor", type: "select", required: true, options: instructors.map((item) => ({ value: item.id, label: item.nomeCompleto })) },
                 { name: "dataPublicacao", label: "Data de publicação", type: "date", required: true },
                 { name: "descricao", label: "Descrição", type: "textarea", col: "col-12", required: true }
             ]}
@@ -133,7 +133,7 @@ export function ModulesPage({ data, addWithId, updateById, removeById, notify, n
             description="Organize módulos dentro dos cursos."
             initialValues={{ idCurso: "", titulo: "", ordem: "" }}
             fields={[
-                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })), actionLabel: "+ Curso", onAction: () => quickCreateCourse({ data, addWithId, notify }) },
+                { name: "idCurso", label: "Curso", type: "select", required: true, options: data.cursos.map((item) => ({ value: item.id, label: item.titulo })) },
                 { name: "titulo", label: "Título", required: true },
                 { name: "ordem", label: "Ordem", type: "number", min: 1, required: true }
             ]}
@@ -191,7 +191,7 @@ export function LessonsPage({ data, addWithId, updateById, removeById, notify, n
             description="Cadastre aulas dentro dos módulos."
             initialValues={{ idModulo: "", titulo: "", tipoConteudo: "", urlConteudo: "", duracaoMinutos: "", ordem: "" }}
             fields={[
-                { name: "idModulo", label: "Módulo", type: "select", required: true, options: data.modulos.map((item) => ({ value: item.id, label: `${nameById(data.cursos, item.idCurso, "titulo")} - ${item.titulo}` })), actionLabel: "+ Módulo", onAction: () => quickCreateModule({ data, addWithId, notify }) },
+                { name: "idModulo", label: "Módulo", type: "select", required: true, options: data.modulos.map((item) => ({ value: item.id, label: `${nameById(data.cursos, item.idCurso, "titulo")} - ${item.titulo}` })) },
                 { name: "titulo", label: "Título", required: true },
                 { name: "tipoConteudo", label: "Tipo", type: "select", required: true, options: ["Vídeo", "Texto", "Quiz"].map((type) => ({ value: type, label: type })) },
                 { name: "duracaoMinutos", label: "Duração em minutos", type: "number", min: 1, required: true },
@@ -289,7 +289,7 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
                 initialValues={{ titulo: "", descricao: "", idCategoria: "" }}
                 fields={[
                     { name: "titulo", label: "Título", required: true },
-                    { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })), actionLabel: "+ Categoria", onAction: () => quickCreateCategory({ data, addWithId, notify }) },
+                    { name: "idCategoria", label: "Categoria", type: "select", required: true, options: data.categorias.map((item) => ({ value: item.id, label: item.nome })) },
                     { name: "descricao", label: "Descrição", type: "textarea", col: "col-12" }
                 ]}
                 columns={[
@@ -322,8 +322,8 @@ export function TracksPage({ data, addWithId, addDirect, updateById, removeById,
             <section className="panel">
                 <h2 className="h5 mb-3">Cursos da trilha</h2>
                 <form className="row g-3" onSubmit={submitLink}>
-                    <SelectInput label="Trilha" value={linkForm.idTrilha} required options={data.trilhas.map((item) => ({ value: item.id, label: item.titulo }))} actionLabel="+ Trilha" onAction={() => quickCreateTrack({ data, addWithId, notify })} onChange={(value) => setLinkForm((current) => ({ ...current, idTrilha: value }))} />
-                    <SelectInput label="Curso" value={linkForm.idCurso} required options={data.cursos.map((item) => ({ value: item.id, label: item.titulo }))} actionLabel="+ Curso" onAction={() => quickCreateCourse({ data, addWithId, notify })} onChange={(value) => setLinkForm((current) => ({ ...current, idCurso: value }))} />
+                    <SelectInput label="Trilha" value={linkForm.idTrilha} required options={data.trilhas.map((item) => ({ value: item.id, label: item.titulo }))} onChange={(value) => setLinkForm((current) => ({ ...current, idTrilha: value }))} />
+                    <SelectInput label="Curso" value={linkForm.idCurso} required options={data.cursos.map((item) => ({ value: item.id, label: item.titulo }))} onChange={(value) => setLinkForm((current) => ({ ...current, idCurso: value }))} />
                     <TextInput label="Ordem" value={linkForm.ordem} required type="number" onChange={(value) => setLinkForm((current) => ({ ...current, ordem: value }))} />
                     <div className="col-12"><button className="btn btn-primary" type="submit">Vincular</button></div>
                 </form>

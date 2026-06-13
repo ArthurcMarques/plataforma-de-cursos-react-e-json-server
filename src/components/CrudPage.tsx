@@ -15,8 +15,6 @@ export interface FieldConfig {
     step?: string;
     col?: string;
     options?: SelectOption[];
-    actionLabel?: string;
-    onAction?: () => void;
 }
 
 export interface ColumnConfig {
@@ -140,14 +138,7 @@ function FormField({ field, value, onChange }: {
 
     return (
         <div className={field.col ?? "col-12 col-md-6"}>
-            <div className="field-heading">
-                <label className="form-label mb-0" htmlFor={field.name}>{field.label}</label>
-                {field.onAction && field.actionLabel && (
-                    <button className="btn btn-sm btn-outline-primary" type="button" onClick={field.onAction}>
-                        {field.actionLabel}
-                    </button>
-                )}
-            </div>
+            <label className="form-label" htmlFor={field.name}>{field.label}</label>
             {field.type === "select" ? (
                 <select {...commonProps} className="form-select">
                     <option value="">Selecione</option>
