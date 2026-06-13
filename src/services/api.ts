@@ -1,4 +1,5 @@
 import type { AppData, CollectionName, RecordId } from "../models/types";
+import { modelSchemas } from "../models/types";
 
 type AnyRecord = Record<string, any>;
 
@@ -32,17 +33,19 @@ export async function fetchAppData(): Promise<AppData> {
     const data = emptyAppData();
 
     for (const name of collections) {
-        (data as any)[name] = await request<any[]>(`/${name}`);
+        (data as any)[name] = validateCollection(name, await request<any[]>(`/${name}`));
     }
 
     return data;
 }
 
 export async function createRecord(name: CollectionName, record: AnyRecord): Promise<AnyRecord> {
-    return request<AnyRecord>(`/${name}`, {
+    const saved = await request<AnyRecord>(`/${name}`, {
         method: "POST",
         body: JSON.stringify(record)
     });
+
+    return validateRecord(name, saved);
 }
 
 export async function updateRecord(
@@ -50,10 +53,12 @@ export async function updateRecord(
     id: RecordId,
     patch: AnyRecord
 ): Promise<AnyRecord> {
-    return request<AnyRecord>(`/${name}/${id}`, {
+    const saved = await request<AnyRecord>(`/${name}/${id}`, {
         method: "PATCH",
         body: JSON.stringify(patch)
     });
+
+    return validateRecord(name, saved);
 }
 
 export async function deleteRecord(name: CollectionName, id: RecordId): Promise<void> {
@@ -76,4 +81,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     }
 
     return response.json() as Promise<T>;
+}
+
+function validateCollection(name: CollectionName, records: AnyRecord[]) {
+    return records.map((record) => validateRecord(name, record));
+}
+
+function validateRecord(name: CollectionName, record: AnyRecord) {
+    return modelSchemas[name].parse(record);
 }

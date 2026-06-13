@@ -1,4 +1,5 @@
-// Nomes das colecoes mantidas no JSON Server.
+import { z } from "zod";
+
 export type CollectionName =
     | "usuarios"
     | "categorias"
@@ -17,123 +18,288 @@ export type CollectionName =
 
 export type RecordId = number | string;
 
-// Entidades principais da plataforma.
-export interface Usuario {
-    id: RecordId;
-    nomeCompleto: string;
-    email: string;
-    senha: string;
-    dataCadastro: string;
-    tipoUsuario: "Aluno" | "Instrutor";
+const idSchema = z.union([z.number(), z.string()]);
+const textSchema = z.string();
+const numberSchema = z.coerce.number();
+
+export class Usuario {
+    static schema = z.object({
+        id: idSchema,
+        nomeCompleto: textSchema,
+        email: textSchema,
+        senha: textSchema,
+        dataCadastro: textSchema,
+        tipoUsuario: z.enum(["Aluno", "Instrutor"])
+    });
+
+    constructor(
+        public id: RecordId,
+        public nomeCompleto: string,
+        public email: string,
+        public senha: string,
+        public dataCadastro: string,
+        public tipoUsuario: "Aluno" | "Instrutor"
+    ) { }
 }
 
-export interface Categoria {
-    id: RecordId;
-    nome: string;
-    descricao: string;
+export class Categoria {
+    static schema = z.object({
+        id: idSchema,
+        nome: textSchema,
+        descricao: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public nome: string,
+        public descricao: string
+    ) { }
 }
 
-export interface Curso {
-    id: RecordId;
-    titulo: string;
-    descricao: string;
-    nivel: "Iniciante" | "Intermediário" | "Avançado";
-    idCategoria: number;
-    idInstrutor: number;
-    dataPublicacao: string;
-    totalAulas: number;
-    totalHoras: number;
+export class Curso {
+    static schema = z.object({
+        id: idSchema,
+        titulo: textSchema,
+        descricao: textSchema,
+        nivel: z.enum(["Iniciante", "Intermediário", "Avançado"]),
+        idCategoria: numberSchema,
+        idInstrutor: numberSchema,
+        dataPublicacao: textSchema,
+        totalAulas: numberSchema,
+        totalHoras: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public titulo: string,
+        public descricao: string,
+        public nivel: "Iniciante" | "Intermediário" | "Avançado",
+        public idCategoria: number,
+        public idInstrutor: number,
+        public dataPublicacao: string,
+        public totalAulas: number,
+        public totalHoras: number
+    ) { }
 }
 
-export interface Modulo {
-    id: RecordId;
-    idCurso: number;
-    titulo: string;
-    ordem: number;
+export class Modulo {
+    static schema = z.object({
+        id: idSchema,
+        idCurso: numberSchema,
+        titulo: textSchema,
+        ordem: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idCurso: number,
+        public titulo: string,
+        public ordem: number
+    ) { }
 }
 
-export interface Aula {
-    id: RecordId;
-    idModulo: number;
-    titulo: string;
-    tipoConteudo: "Vídeo" | "Texto" | "Quiz";
-    urlConteudo: string;
-    duracaoMinutos: number;
-    ordem: number;
+export class Aula {
+    static schema = z.object({
+        id: idSchema,
+        idModulo: numberSchema,
+        titulo: textSchema,
+        tipoConteudo: z.enum(["Vídeo", "Texto", "Quiz"]),
+        urlConteudo: textSchema,
+        duracaoMinutos: numberSchema,
+        ordem: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idModulo: number,
+        public titulo: string,
+        public tipoConteudo: "Vídeo" | "Texto" | "Quiz",
+        public urlConteudo: string,
+        public duracaoMinutos: number,
+        public ordem: number
+    ) { }
 }
 
-export interface Matricula {
-    id: RecordId;
-    idUsuario: number;
-    idCurso: number;
-    dataMatricula: string;
-    dataConclusao: string | null;
+export class Matricula {
+    static schema = z.object({
+        id: idSchema,
+        idUsuario: numberSchema,
+        idCurso: numberSchema,
+        dataMatricula: textSchema,
+        dataConclusao: z.union([textSchema, z.null()])
+    });
+
+    constructor(
+        public id: RecordId,
+        public idUsuario: number,
+        public idCurso: number,
+        public dataMatricula: string,
+        public dataConclusao: string | null
+    ) { }
 }
 
-export interface ProgressoAula {
-    id: RecordId;
-    idUsuario: number;
-    idAula: number;
-    status: "Concluído" | "Em andamento";
-    dataConclusao: string;
+export class ProgressoAula {
+    static schema = z.object({
+        id: idSchema,
+        idUsuario: numberSchema,
+        idAula: numberSchema,
+        status: z.enum(["Concluído", "Em andamento"]),
+        dataConclusao: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idUsuario: number,
+        public idAula: number,
+        public status: "Concluído" | "Em andamento",
+        public dataConclusao: string
+    ) { }
 }
 
-export interface Avaliacao {
-    id: RecordId;
-    idUsuario: number;
-    idCurso: number;
-    nota: number;
-    comentario: string;
-    dataAvaliacao: string;
+export class Avaliacao {
+    static schema = z.object({
+        id: idSchema,
+        idUsuario: numberSchema,
+        idCurso: numberSchema,
+        nota: numberSchema,
+        comentario: textSchema,
+        dataAvaliacao: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idUsuario: number,
+        public idCurso: number,
+        public nota: number,
+        public comentario: string,
+        public dataAvaliacao: string
+    ) { }
 }
 
-export interface Trilha {
-    id: RecordId;
-    titulo: string;
-    descricao: string;
-    idCategoria: number;
+export class Trilha {
+    static schema = z.object({
+        id: idSchema,
+        titulo: textSchema,
+        descricao: textSchema,
+        idCategoria: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public titulo: string,
+        public descricao: string,
+        public idCategoria: number
+    ) { }
 }
 
-export interface TrilhaCurso {
-    id: RecordId;
-    idTrilha: number;
-    idCurso: number;
-    ordem: number;
+export class TrilhaCurso {
+    static schema = z.object({
+        id: idSchema,
+        idTrilha: numberSchema,
+        idCurso: numberSchema,
+        ordem: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idTrilha: number,
+        public idCurso: number,
+        public ordem: number
+    ) { }
 }
 
-export interface Certificado {
-    id: RecordId;
-    idUsuario: number;
-    idCurso: number;
-    idTrilha: number | null;
-    codigoVerificacao: string;
-    dataEmissao: string;
+export class Certificado {
+    static schema = z.object({
+        id: idSchema,
+        idUsuario: numberSchema,
+        idCurso: numberSchema,
+        idTrilha: z.union([numberSchema, z.null()]),
+        codigoVerificacao: textSchema,
+        dataEmissao: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idUsuario: number,
+        public idCurso: number,
+        public idTrilha: number | null,
+        public codigoVerificacao: string,
+        public dataEmissao: string
+    ) { }
 }
 
-export interface Plano {
-    id: RecordId;
-    nome: string;
-    descricao: string;
-    preco: number;
-    duracaoMeses: number;
+export class Plano {
+    static schema = z.object({
+        id: idSchema,
+        nome: textSchema,
+        descricao: textSchema,
+        preco: numberSchema,
+        duracaoMeses: numberSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public nome: string,
+        public descricao: string,
+        public preco: number,
+        public duracaoMeses: number
+    ) { }
 }
 
-export interface Assinatura {
-    id: RecordId;
-    idUsuario: number;
-    idPlano: number;
-    dataInicio: string;
-    dataFim: string;
+export class Assinatura {
+    static schema = z.object({
+        id: idSchema,
+        idUsuario: numberSchema,
+        idPlano: numberSchema,
+        dataInicio: textSchema,
+        dataFim: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idUsuario: number,
+        public idPlano: number,
+        public dataInicio: string,
+        public dataFim: string
+    ) { }
 }
 
-export interface Pagamento {
-    id: RecordId;
-    idAssinatura: number;
-    valorPago: number;
-    dataPagamento: string;
-    metodoPagamento: "Cartão" | "Pix" | "Boleto";
-    idTransacaoGateway: string;
+export class Pagamento {
+    static schema = z.object({
+        id: idSchema,
+        idAssinatura: numberSchema,
+        valorPago: numberSchema,
+        dataPagamento: textSchema,
+        metodoPagamento: z.enum(["Cartão", "Pix", "Boleto"]),
+        idTransacaoGateway: textSchema
+    });
+
+    constructor(
+        public id: RecordId,
+        public idAssinatura: number,
+        public valorPago: number,
+        public dataPagamento: string,
+        public metodoPagamento: "Cartão" | "Pix" | "Boleto",
+        public idTransacaoGateway: string
+    ) { }
 }
+
+export const modelSchemas = {
+    usuarios: Usuario.schema,
+    categorias: Categoria.schema,
+    cursos: Curso.schema,
+    modulos: Modulo.schema,
+    aulas: Aula.schema,
+    matriculas: Matricula.schema,
+    progressoAulas: ProgressoAula.schema,
+    avaliacoes: Avaliacao.schema,
+    trilhas: Trilha.schema,
+    trilhasCursos: TrilhaCurso.schema,
+    certificados: Certificado.schema,
+    planos: Plano.schema,
+    assinaturas: Assinatura.schema,
+    pagamentos: Pagamento.schema
+};
 
 export interface AppData {
     usuarios: Usuario[];
